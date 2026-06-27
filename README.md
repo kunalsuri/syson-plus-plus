@@ -2,7 +2,7 @@
 <div align="center">
 
 <h1>🛸 The SysON++ Project</h1>
-<h3>The AI-Native Codebase</h3>
+<h3>The The AI-Native Codebase</h3>
 
 [![Status: experimental](https://img.shields.io/badge/status-experimental%20R%26D-blueviolet?style=for-the-badge)](#-the-experiment)
 [![License: EPL-2.0](https://img.shields.io/badge/license-EPL--2.0-informational?style=for-the-badge)](LICENSE)
@@ -167,8 +167,10 @@ the same license as upstream [Eclipse SysON](https://github.com/eclipse-syson/sy
 
 <br>
 
+---
+
 <details>
-<summary><b>🗂️ Click to expand: the original SysON Project README (from upstream)</b></summary>
+<summary><b>🗂️ Click to Expand: The SysON Project Readme (from upstream)</b></summary>
 
 ---
 
