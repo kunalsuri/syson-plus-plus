@@ -5,10 +5,13 @@
 <h3>The AI-Native SysML&nbsp;v2 Codebase</h3>
 
 [![License: EPL-2.0](https://img.shields.io/badge/license-EPL--2.0-informational?style=for-the-badge)](LICENSE)
+
 [![Java 21](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk&logoColor=white)](pom.xml)
 [![Node 22.16](https://img.shields.io/badge/Node-22.16.0-green?style=for-the-badge&logo=nodedotjs&logoColor=white)](package.json)
 [![PostgreSQL 15](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql&logoColor=white)](docker-compose.yml)
+
 [![Status: experimental](https://img.shields.io/badge/status-experimental%20R%26D-blueviolet?style=for-the-badge)](#-the-experiment)
+
 [![Agent-ready](https://img.shields.io/badge/agents-Claude%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Windsurf-black?style=for-the-badge&logo=anthropic&logoColor=white)](ai/INDEX.md)
 
 </div>
