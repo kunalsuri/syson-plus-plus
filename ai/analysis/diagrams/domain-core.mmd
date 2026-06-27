@@ -1,0 +1,36 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% [inferred] by /cold-start 2026-06-27 — core domain types are the standard SysML v2 /
+%% KerML + Sirius Web concepts implied by module names and the README; class members
+%% and exact relationships are NOT yet read from the EMF metamodel. Needs human audit.
+classDiagram
+    class Element {
+        +id
+        +name
+        %% KerML root concept
+    }
+    class Definition {
+        %% SysML v2 *Definition (e.g. PartDefinition)
+    }
+    class Usage {
+        %% SysML v2 *Usage (e.g. PartUsage)
+    }
+    class Relationship
+    class Representation {
+        %% Sirius: a view over the model
+    }
+    class Diagram
+    class Table
+    class Tree
+    class View {
+        %% Sirius View-DSL definition
+    }
+
+    Element <|-- Definition
+    Element <|-- Usage
+    Element <|-- Relationship
+    Usage ..> Definition : typed by
+    Representation ..> Element : presents
+    Representation <|-- Diagram
+    Representation <|-- Table
+    Representation <|-- Tree
+    View ..> Representation : declares

@@ -1,0 +1,26 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% [inferred] by /cold-start 2026-06-27 — dependency direction (metamodel -> services
+%% -> views -> application) VERIFIED 2026-06-27 against representative module pom.xml
+%% <dependencies> (syson-application -> views -> services -> syson-sysml-metamodel).
+%% Tag stays [inferred] until a human flips it to [verified].
+graph TD
+    subgraph backend["backend/ (Java 21, Spring Boot, frozen upstream)"]
+        metamodel["metamodel<br/>(SysML v2 / KerML EMF + custom nodes)"]
+        services["services<br/>(diagram / form / table / tree / model / REST / direct-edit)"]
+        views["views<br/>(Sirius View-DSL: diagrams, tables, tree)"]
+        application["application<br/>(SysONApplication + import/export/validation + serves UI)"]
+        tests["tests (syson-tests)"]
+        releng["releng (resources, coverage)"]
+    end
+    subgraph frontend["frontend/ (TypeScript, npm + Turborepo, frozen upstream)"]
+        components["syson-components<br/>(@eclipse-syson/syson-components)"]
+        app["syson<br/>(@eclipse-syson/syson)"]
+    end
+
+    metamodel --> services
+    services --> views
+    views --> application
+    components --> app
+    app -. GraphQL .-> application
+    tests -.-> application
+    releng -.-> backend

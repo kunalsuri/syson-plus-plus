@@ -1,0 +1,24 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% [inferred] by /cold-start 2026-06-27 — the GraphQL seam is VERIFIED by code presence
+%% (*DataFetcher.java on the backend; Apollo Client @apollo/client on the frontend).
+%% Subscription transport is owned by the Sirius Web platform (sirius-components-core),
+%% not wired in this repo. Persistence = PostgreSQL (docker-compose + SPRING_DATASOURCE).
+graph LR
+    user([User / browser])
+    subgraph fe["frontend/ (React + TS)"]
+        app["syson app"]
+        comps["syson-components<br/>(custom nodes, extensions)"]
+    end
+    subgraph be["backend/ (Spring Boot + Sirius Web)"]
+        gql["GraphQL API<br/>(*DataFetcher / Mutation*DataFetcher)"]
+        svc["services + views"]
+        meta["metamodel (EMF)"]
+        db[("PostgreSQL 15<br/>(verified)")]
+    end
+
+    user --> app
+    comps --> app
+    app -- "GraphQL query/mutation via Apollo (verified)" --> gql
+    gql == "subscriptions: Sirius Web platform (sirius-components-core)" ==> app
+    gql --> svc --> meta
+    svc -- "Spring datasource (jdbc:postgresql)" --> db

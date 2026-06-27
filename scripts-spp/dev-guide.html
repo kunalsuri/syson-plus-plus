@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SysON++ — How to Run the Project</title>
+  <style>
+    :root {
+      --bg:           #0d1117;
+      --surface:      #161b22;
+      --card:         #21262d;
+      --border:       #30363d;
+      --text:         #c9d1d9;
+      --text-bright:  #e6edf3;
+      --text-muted:   #8b949e;
+      --accent:       #58a6ff;
+      --green:        #3fb950;
+      --orange:       #e3b341;
+      --red:          #f85149;
+      --purple:       #bc8cff;
+      --code-bg:      #161b22;
+      --nav-height:   56px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 15px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-height);
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 28px;
+    }
+    nav .brand { font-weight: 700; font-size: 1rem; color: var(--text-bright); letter-spacing: -0.3px; }
+    nav .brand span { color: var(--accent); }
+    nav a {
+      color: var(--text-muted); text-decoration: none; font-size: 0.85rem;
+      transition: color 0.15s;
+    }
+    nav a:hover { color: var(--text-bright); }
+    nav .nav-links { display: flex; gap: 20px; }
+
+    /* ── Hero ── */
+    header {
+      padding: 72px 32px 60px;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88,166,255,0.12), transparent);
+      pointer-events: none;
+    }
+    header h1 {
+      font-size: 2.8rem; font-weight: 800;
+      color: var(--text-bright); letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    header h1 span { color: var(--accent); }
+    header p {
+      font-size: 1.1rem; color: var(--text-muted);
+      max-width: 520px; margin: 0 auto 24px;
+    }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .badge {
+      padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-blue   { color: var(--accent);  border-color: rgba(88,166,255,0.3);  background: rgba(88,166,255,0.08); }
+    .badge-green  { color: var(--green);   border-color: rgba(63,185,80,0.3);   background: rgba(63,185,80,0.08); }
+    .badge-purple { color: var(--purple);  border-color: rgba(188,140,255,0.3); background: rgba(188,140,255,0.08); }
+    .badge-orange { color: var(--orange);  border-color: rgba(227,179,65,0.3);  background: rgba(227,179,65,0.08); }
+
+    /* ── Layout ── */
+    main { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text-bright); margin-bottom: 20px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    h2 .icon { font-size: 1.2rem; }
+
+    h3 { font-size: 1rem; font-weight: 600; color: var(--text-bright); margin-bottom: 8px; }
+
+    p { margin-bottom: 12px; color: var(--text); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+    }
+    .card-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .path-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 24px;
+    }
+    .path-card.primary { border-color: rgba(88,166,255,0.4); }
+    .path-card .label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .path-card.primary .label { color: var(--accent); }
+    .path-card.secondary .label { color: var(--green); }
+    .path-card h3 { margin-bottom: 14px; }
+
+    /* ── Code blocks ── */
+    .code-wrap { position: relative; margin: 10px 0; }
+    .code-wrap pre {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px;
+      font-family: 'Consolas', 'Cascadia Code', 'Courier New', monospace;
+      font-size: 0.88rem; color: #e6edf3;
+      overflow-x: auto; white-space: pre;
+    }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 6px;
+      padding: 4px 10px; font-size: 0.75rem; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { background: var(--card); color: var(--text-bright); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    /* ── Step list ── */
+    .steps { list-style: none; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      display: flex; gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    .steps li::before {
+      content: counter(step);
+      min-width: 28px; height: 28px;
+      background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.4);
+      color: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+    .steps li .step-body { flex: 1; }
+    .steps li .step-note {
+      font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;
+    }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead tr { background: var(--surface); }
+    th { text-align: left; padding: 10px 14px; color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    code {
+      font-family: 'Consolas', 'Cascadia Code', monospace;
+      font-size: 0.85em;
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1px 6px; color: var(--accent);
+    }
+
+    /* ── Script cards ── */
+    .script-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 20px; margin-bottom: 12px;
+      display: grid; grid-template-columns: auto 1fr; gap: 0 16px;
+      align-items: start;
+    }
+    .script-tag {
+      font-family: 'Consolas', monospace; font-size: 0.82rem;
+      color: var(--accent); background: rgba(88,166,255,0.1);
+      border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 6px; padding: 3px 10px;
+      white-space: nowrap; margin-top: 2px;
+    }
+    .script-card p { margin: 0; font-size: 0.9rem; }
+    .script-card .when { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── URL table ── */
+    .url-row td:first-child { font-family: 'Consolas', monospace; font-size: 0.85rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .status-dot {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--green);
+      margin-right: 6px; animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ── Callouts ── */
+    .callout {
+      border-radius: 8px; padding: 14px 16px;
+      margin: 14px 0; display: flex; gap: 10px;
+      font-size: 0.9rem;
+    }
+    .callout-warn  { background: rgba(227,179,65,0.08); border: 1px solid rgba(227,179,65,0.3); }
+    .callout-info  { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.3); }
+    .callout-tip   { background: rgba(63,185,80,0.08);  border: 1px solid rgba(63,185,80,0.3); }
+    .callout .icon { flex-shrink: 0; }
+
+    /* ── Troubleshoot ── */
+    .trouble-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+    }
+    .trouble-q {
+      padding: 14px 20px; font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text-bright);
+    }
+    .trouble-q:hover { background: rgba(255,255,255,0.03); }
+    .trouble-q .chevron { transition: transform 0.2s; color: var(--text-muted); }
+    .trouble-q.open .chevron { transform: rotate(180deg); }
+    .trouble-a {
+      padding: 0 20px; max-height: 0; overflow: hidden;
+      transition: max-height 0.25s ease, padding 0.25s ease;
+    }
+    .trouble-a.open { max-height: 400px; padding: 0 20px 16px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 32px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.82rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────── -->
+<nav>
+  <span class="brand">SysON<span>++</span></span>
+  <div class="nav-links">
+    <a href="#quickstart">Quick Start</a>
+    <a href="#prerequisites">Prerequisites</a>
+    <a href="#scripts">Scripts</a>
+    <a href="#services">Services</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────── -->
+<header>
+  <h1>SysON<span>++</span></h1>
+  <p>Web-based SysML v2 Modelling Environment — developer setup guide</p>
+  <div class="badges">
+    <span class="badge badge-blue">Java 21</span>
+    <span class="badge badge-blue">Spring Boot</span>
+    <span class="badge badge-green">Node 22</span>
+    <span class="badge badge-green">React + TypeScript</span>
+    <span class="badge badge-purple">PostgreSQL 15</span>
+    <span class="badge badge-orange">Docker</span>
+    <span class="badge badge-orange">Windows PowerShell</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Quick Start ─────────────────────────────────── -->
+  <section id="quickstart">
+    <h2><span class="icon">⚡</span> Quick Start</h2>
+
+    <div class="card-grid">
+
+      <div class="path-card primary">
+        <div class="label">🆕 First time on this machine</div>
+        <h3>Full setup + build</h3>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">
+          Checks all dependencies, installs missing tools, and compiles the backend (~5–15 min on first run).
+        </p>
+        <div class="code-wrap">
+          <pre>.\scripts-spp\setup-dev.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\setup-dev.ps1')">Copy</button>
+        </div>
+      </div>
+
+      <div class="path-card secondary">
+        <div class="label">🔄 Every day after that</div>
+        <h3>Start everything</h3>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">
+          Starts database, backend, and frontend in order. Assumes the project is already built.
+        </p>
+        <div class="code-wrap">
+          <pre>.\scripts-spp\start-dev.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\start-dev.ps1')">Copy</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:12px;">Stop everything</h3>
+      <div class="code-wrap">
+        <pre>.\scripts-spp\stop-dev.ps1</pre>
+        <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\stop-dev.ps1')">Copy</button>
+      </div>
+      <p style="font-size:0.84rem;color:var(--text-muted);margin-top:8px;margin-bottom:0;">
+        Safe stop: only kills the SysON++ Java process and the Vite server. Does <strong>not</strong> touch IntelliJ, VS Code, or any other running application.
+        The PostgreSQL container is paused — not deleted — so your data is preserved.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Prerequisites ───────────────────────────────── -->
+  <section id="prerequisites">
+    <h2><span class="icon">📋</span> Prerequisites</h2>
+
+    <p>Open a PowerShell terminal and verify each tool is installed before running the scripts.</p>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Required</th>
+            <th>Verify</th>
+            <th>Install if missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Git</strong></td>
+            <td>Any recent</td>
+            <td><code>git --version</code></td>
+            <td><code>winget install Git.Git</code></td>
+          </tr>
+          <tr>
+            <td><strong>fnm</strong> <span style="font-size:0.78rem;color:var(--text-muted)">(Node version manager)</span></td>
+            <td>Any</td>
+            <td><code>fnm --version</code></td>
+            <td><code>winget install Schniz.fnm</code></td>
+          </tr>
+          <tr>
+            <td><strong>Node.js</strong></td>
+            <td>v22.16.0</td>
+            <td><code>node --version</code></td>
+            <td><code>fnm install 22.16.0 &amp;&amp; fnm use 22.16.0</code></td>
+          </tr>
+          <tr>
+            <td><strong>Java JDK</strong></td>
+            <td>21+</td>
+            <td><code>java -version</code></td>
+            <td><code>winget install EclipseAdoptium.Temurin.21.JDK</code></td>
+          </tr>
+          <tr>
+            <td><strong>Maven</strong></td>
+            <td>3.9+</td>
+            <td><code>mvn --version</code></td>
+            <td><code>setup-dev.ps1</code> installs it automatically</td>
+          </tr>
+          <tr>
+            <td><strong>Docker Desktop</strong></td>
+            <td>Running</td>
+            <td><code>docker info</code></td>
+            <td><code>winget install Docker.DockerDesktop</code> then restart</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="icon">⚠️</span>
+      <div>
+        <strong>GitHub Personal Access Token required for first build.</strong><br/>
+        Maven downloads Sirius Web packages from GitHub Package Registry.
+        Before running <code>setup-dev.ps1</code> for the first time, set your token:<br/><br/>
+        <code>$env:PASSWORD = 'your-github-pat-here'</code><br/><br/>
+        Create a token at <strong>github.com → Settings → Developer settings → Personal access tokens</strong>.
+        Enable the <code>read:packages</code> scope.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Scripts ─────────────────────────────────────── -->
+  <section id="scripts">
+    <h2><span class="icon">📁</span> What Each Script Does</h2>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\start-dev.ps1</span>
+      <div>
+        <p><strong>Daily orchestrator.</strong> Starts all three services in order — database first, then backend, then frontend. Waits for each service to be ready before starting the next. Use this every day.</p>
+        <p class="when">Use: every time you sit down to work.</p>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\setup-dev.ps1</span>
+      <div>
+        <p><strong>First-time setup.</strong> Checks and installs all dependencies, runs the Maven build (~5–15 min), installs npm packages, then starts all services. Use this once when setting up a new machine.</p>
+        <p class="when">Use: once on a new machine, or after a major dependency change.</p>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\stop-dev.ps1</span>
+      <div>
+        <p><strong>Safe shutdown.</strong> Stops only the SysON++ Java process (matched by JAR name), the Vite server (matched by port 5173), and pauses the PostgreSQL container. Will not touch any other application.</p>
+        <p class="when">Use: when you are done working.</p>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\start-db.ps1</span>
+      <div>
+        <p><strong>Database only.</strong> Starts the PostgreSQL Docker container and waits for it to be ready on port 5432.</p>
+        <p class="when">Use: if only the database needs to be restarted.</p>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\start-backend.ps1</span>
+      <div>
+        <p><strong>Backend only.</strong> Starts the Spring Boot JAR as a background process. Logs go to <code>%TEMP%\sysonpp-backend.log</code>. Waits up to 120 seconds for port 8080.</p>
+        <p class="when">Use: after a Java code change and rebuild.</p>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <span class="script-tag">scripts-spp\start-frontend.ps1</span>
+      <div>
+        <p><strong>Frontend only.</strong> Activates fnm Node v22, then starts the Vite dev server via <code>turbo run start</code>. Logs go to <code>%TEMP%\sysonpp-frontend.log</code>. Waits up to 60 seconds for port 5173.</p>
+        <p class="when">Use: after a TypeScript/React change when the backend is already running.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Services ────────────────────────────────────── -->
+  <section id="services">
+    <h2><span class="icon">🌐</span> What's Running &amp; Where</h2>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="url-row">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>URL</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>React App</td>
+            <td><span class="status-dot"></span><a href="http://localhost:5173" target="_blank">http://localhost:5173</a></td>
+            <td>Open this in your browser — this is the SysON++ UI</td>
+          </tr>
+          <tr>
+            <td>Backend API</td>
+            <td><a href="http://localhost:8080" target="_blank">http://localhost:8080</a></td>
+            <td>Spring Boot. The root path returns 404 — that is normal</td>
+          </tr>
+          <tr>
+            <td>GraphQL</td>
+            <td><a href="http://localhost:8080/api/graphql" target="_blank">http://localhost:8080/api/graphql</a></td>
+            <td>GraphQL endpoint used by the frontend</td>
+          </tr>
+          <tr>
+            <td>Actuator</td>
+            <td><a href="http://localhost:8080/actuator" target="_blank">http://localhost:8080/actuator</a></td>
+            <td>Spring Boot health and metrics</td>
+          </tr>
+          <tr>
+            <td>PostgreSQL</td>
+            <td>localhost:5432</td>
+            <td>Database. User: <code>test_username</code> / Pass: <code>test_password</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:16px;">
+      <span class="icon">ℹ️</span>
+      <div>
+        Log files are written to your Windows <code>%TEMP%</code> folder while services are running:<br/>
+        <code>%TEMP%\sysonpp-backend.log</code> &nbsp;|&nbsp; <code>%TEMP%\sysonpp-frontend.log</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Troubleshooting ─────────────────────────────── -->
+  <section id="troubleshooting">
+    <h2><span class="icon">🔧</span> Troubleshooting</h2>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        npm crashes with an EPERM error about <code>admin-local\AppData</code>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>This happens when Node.js was installed system-wide by a different Windows user (<code>admin-local</code>) via NVM4W. The fix is to use <strong>fnm</strong>, which manages Node per-user.</p>
+        <div class="code-wrap">
+          <pre>winget install Schniz.fnm
+# Open a new terminal, then:
+fnm install 22.16.0
+fnm use 22.16.0
+node --version   # should print v22.16.0</pre>
+          <button class="copy-btn" onclick="copy(this, 'winget install Schniz.fnm')">Copy</button>
+        </div>
+        <p>The scripts activate fnm automatically, so once fnm is installed you should not need to do this again.</p>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        Maven build fails — authentication error or package not found
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>The Maven build downloads Sirius Web packages from GitHub Package Registry and requires a Personal Access Token (PAT).</p>
+        <div class="code-wrap">
+          <pre># In your PowerShell session before running setup-dev.ps1:
+$env:PASSWORD = 'ghp_your_token_here'</pre>
+          <button class="copy-btn" onclick="copy(this, '$env:PASSWORD = \'ghp_your_token_here\'')">Copy</button>
+        </div>
+        <p>To avoid doing this every session, add it to your PowerShell profile: <code>notepad $PROFILE</code></p>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        Docker daemon is not running
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>Open <strong>Docker Desktop</strong> from the Start Menu and wait for the whale icon in the taskbar to stop animating. Then run the script again. If Docker is not installed:</p>
+        <div class="code-wrap">
+          <pre>winget install Docker.DockerDesktop</pre>
+          <button class="copy-btn" onclick="copy(this, 'winget install Docker.DockerDesktop')">Copy</button>
+        </div>
+        <p>After installing Docker Desktop, you must <strong>restart your computer</strong> before it will work.</p>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        Backend JAR not found — build the project first
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>The JAR is produced by the Maven build. If you cloned a fresh copy of the repo, or after a major version change, you must build first.</p>
+        <div class="code-wrap">
+          <pre>.\scripts-spp\setup-dev.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\setup-dev.ps1')">Copy</button>
+        </div>
+        <p>This can take 5–15 minutes on the first run as it downloads all Maven dependencies.</p>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        Port 8080 or 5173 is already in use
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>Another process is occupying the port. Run the stop script first, then try again.</p>
+        <div class="code-wrap">
+          <pre>.\scripts-spp\stop-dev.ps1
+.\scripts-spp\start-dev.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\stop-dev.ps1\n.\\scripts-spp\\start-dev.ps1')">Copy</button>
+        </div>
+        <p>To find what process owns a port: <code>Get-NetTCPConnection -LocalPort 8080 -State Listen</code></p>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggle(this)">
+        http://localhost:8080 shows "Page Not Found"
+        <span class="chevron">▾</span>
+      </div>
+      <div class="trouble-a">
+        <p>That is expected. Port 8080 is the <strong>API backend</strong> — it has no UI at the root path. The application you open in your browser is at <a href="http://localhost:5173" target="_blank">http://localhost:5173</a>.</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  SysON++ — CEA LIST / Kunal Suri &nbsp;·&nbsp; Eclipse Public License v2.0
+</footer>
+
+<script>
+  function copy(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function toggle(el) {
+    const answer = el.nextElementSibling;
+    const isOpen = answer.classList.contains('open');
+    el.classList.toggle('open', !isOpen);
+    answer.classList.toggle('open', !isOpen);
+  }
+</script>
+
+</body>
+</html>
