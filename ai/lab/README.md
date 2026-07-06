@@ -1,0 +1,37 @@
+<!-- Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved. -->
+# ai/lab/ — development intelligence for syson-plus-plus
+
+The strategic layer: *how* we build and *what we learned* — not code, not navigation.
+Loaded when planning or reviewing, not on every agent session.
+
+| Folder | Contains | Who writes it |
+|---|---|---|
+| `specs/` | One spec per planned/in-progress feature or bug fix | Human + AI draft |
+| `decisions/` | Architecture Decision Records (ADRs) | Human |
+| `reviews/` | Evidence-based change reviews, one per unit of work | AI (fresh session) + human |
+| `evaluations/` | Post-implementation retrospectives | Human |
+| `experiments/` | AI-agent approach trials: prompts, configs, outcomes | Human + AI |
+| `WORKLOG.md` | The work ledger — one row per unit of work, linking all of the above | AI appends, human audits |
+| `ROADMAP.md` | The feature roadmap — Planned backlog + Shipped index, per feature (cousin of `WORKLOG.md`) | AI drafts, human audits |
+
+## The engineering loop — every unit of work (feature or bug)
+```
+1. Spec      →  specs/SPEC_<name>.md            (feature — copy SPEC_TEMPLATE.md)
+                specs/BUGFIX_<name>.md          (bug — copy BUGFIX_TEMPLATE.md)
+2. Decide    →  decisions/ADR_<n>-<title>.md    (any non-obvious design choice)
+3. Implement →  /add-feature or /fix-bug — the agent reads the spec
+4. Review    →  reviews/REVIEW_<id>.md via /review-change (fresh context,
+                never the implementing session)
+5. Evaluate  →  evaluations/EVAL_<name>.md      (human, after the work ships —
+                copy EVALUATION_TEMPLATE.md)
+6. Record    →  WORKLOG.md row linking spec ↔ review ↔ eval ↔ commits
+7. Learn     →  experiments/EXP_<n>-<desc>.md   (optional — if the AI approach
+                was novel or failed)
+8. Archive   →  (optional) mark spec implemented; entry lands in
+                ai/analysis/FEATURE_CATALOG.md
+```
+Steps 1–6 are the canonical loop — Spec → Decide → Implement → Review →
+Evaluate → Record; steps 7–8 are optional follow-ups. No code before step 1,
+no merge before step 4, no closed row before step 6.
+`verify` checks every backticked path in WORKLOG.md, so the ledger cannot
+silently rot.

@@ -107,3 +107,11 @@ CLAUDE.md
 .agents
 .codex
 AGENTS.md
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
