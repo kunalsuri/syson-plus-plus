@@ -1,0 +1,33 @@
+%% [inferred] seam.mmd — the frontend↔backend boundary. Drafted by /cold-start 2026-07-07.
+%% OBSERVED: Apollo Client + graphql + subscriptions-transport-ws in frontend/syson
+%% package.json; four SysON *.graphqls schema-extension files in the backend using
+%% "extend type". UNSURE: exact HTTP/WS endpoint paths (owned by Sirius Web) — needs human.
+%% Regenerate via /cold-start; do not hand-maintain.
+graph LR
+    subgraph Browser["frontend/syson (React SPA)"]
+        UI["React components<br/>(syson-components, sirius-components)"]
+        APOLLO["Apollo Client 3.10<br/>+ subscriptions-transport-ws"]
+        UI --> APOLLO
+    end
+
+    subgraph Server["backend/application/syson-application (Spring Boot)"]
+        GQL["GraphQL API<br/>Sirius Web base schema<br/>+ SysON extensions (extend type)"]
+        REST["SysML v2 REST API<br/>(syson-sysml-rest-api-services)"]
+        SVC["SysON services + views"]
+        EMF["EMF model<br/>(syson-sysml-metamodel)"]
+        GQL --> SVC
+        REST --> SVC
+        SVC --> EMF
+    end
+
+    APOLLO -- "queries/mutations over HTTP<br/>(endpoint path: UNSURE)" --> GQL
+    APOLLO -- "live updates over WebSocket<br/>(endpoint path: UNSURE)" --> GQL
+    EXT["external SysML v2 tools"] -- "HTTP (paths UNSURE)" --> REST
+
+    Server --> PG[("PostgreSQL<br/>via Sirius Web persistence")]
+
+    %% SysON schema-extension files (all OBSERVED):
+    %% backend/application/syson-application-configuration/src/main/resources/schema/sysmlcustomnodes.graphqls
+    %% backend/application/syson-application-configuration/src/main/resources/schema/expressions.graphqls
+    %% backend/application/syson-sysml-import/src/main/resources/schema/syson-import.graphqls
+    %% backend/views/syson-diagram-common-view/src/main/resources/schema/syson-diagrams.graphqls

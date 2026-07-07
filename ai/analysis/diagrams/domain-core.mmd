@@ -1,0 +1,50 @@
+%% [inferred] domain-core.mmd — drafted by /cold-start 2026-07-07.
+%% Type NAMES observed in backend/metamodel/syson-sysml-metamodel (generated Java +
+%% sysml.ecore). The inheritance EDGES are inferred from the SysML v2 / KerML spec
+%% shape and NOT verified against the ecore — human audit required.
+%% Regenerate via /cold-start; do not hand-maintain.
+classDiagram
+    class Element {
+        <<root of everything>>
+    }
+    class Relationship
+    class Namespace
+    class Type
+    class Classifier
+    class Feature
+    class Definition {
+        <<the "kind" side>>
+    }
+    class Usage {
+        <<the "instance-in-context" side>>
+    }
+
+    Element <|-- Relationship
+    Element <|-- Namespace
+    Namespace <|-- Type
+    Type <|-- Classifier
+    Type <|-- Feature
+    Classifier <|-- Definition
+    Feature <|-- Usage
+
+    %% The Definition/Usage duality — OBSERVED pairs among generated files:
+    class PartDefinition
+    class PartUsage
+    class ActionDefinition
+    class ActionUsage
+    class AllocationDefinition
+    class AllocationUsage
+    class AnalysisCaseDefinition
+    class AnalysisCaseUsage
+
+    Definition <|-- PartDefinition
+    Definition <|-- ActionDefinition
+    Definition <|-- AllocationDefinition
+    Definition <|-- AnalysisCaseDefinition
+    Usage <|-- PartUsage
+    Usage <|-- ActionUsage
+    Usage <|-- AllocationUsage
+    Usage <|-- AnalysisCaseUsage
+
+    %% Membership/annotation machinery also observed: ActorMembership, Annotation,
+    %% AnnotatingElement, AssertConstraintUsage, AssignmentActionUsage, ...

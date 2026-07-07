@@ -1,0 +1,38 @@
+%% [inferred] package-deps.mmd — drafted by /cold-start 2026-07-07.
+%% Layer ordering INFERRED from module naming and root-pom dependencyManagement;
+%% per-pom dependency edges NOT yet verified — human audit required.
+%% Regenerate via /cold-start; do not hand-maintain.
+graph TD
+    subgraph FE["Frontend — npm workspaces + Turborepo (root package.json)"]
+        APP["frontend/syson<br/>(web app, Vite + React 18)"]
+        LIB["frontend/syson-components<br/>(component library)"]
+        APP --> LIB
+    end
+
+    subgraph BE["Backend — Maven reactor (root pom.xml)"]
+        APPL["backend/application/*<br/>(Spring Boot app, config, import/export, validation)"]
+        VIEWS["backend/views/*<br/>(View-DSL descriptions: diagrams, table, tree)"]
+        SVC["backend/services/*<br/>(model/diagram/form/table/tree services, direct-edit grammar, REST API)"]
+        MM["backend/metamodel/*<br/>(EMF generated: sysml.ecore, sysml-customnodes.ecore)"]
+        APPL --> VIEWS
+        APPL --> SVC
+        VIEWS --> SVC
+        SVC --> MM
+    end
+
+    APP -- "GraphQL over HTTP + WebSocket subscriptions" --> APPL
+
+    SW_FE[/"@eclipse-sirius/sirius-*  npm pkgs 2026.5.4"/]
+    SW_BE[/"Sirius Web backend 2026.5.4<br/>(sirius.web.version in root pom)"/]
+    PG[("PostgreSQL<br/>docker-compose.yml")]
+
+    APP -.-> SW_FE
+    LIB -.-> SW_FE
+    APPL -.-> SW_BE
+    APPL -.-> PG
+
+    subgraph OURS["OURS — SysON++ additions (untracked)"]
+        AI["ai/ knowledge layer"]
+        SPP["scripts-spp/ dev tooling"]
+        CI["\.github/workflows/ai-check.yml CI"]
+    end

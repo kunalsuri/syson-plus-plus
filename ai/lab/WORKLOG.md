@@ -34,3 +34,4 @@ this ledger says *what was done to it, when, and under which contract*.
 
 | ID | Date | Type | Title | Spec | ADRs | Review | Eval | Commits / PR | Knowledge updated | Status | Provenance |
 |---|---|---|---|---|---|---|---|---|---|---|---|
+| W-001 | 2026-07-07 | process | /cold-start bootstrap of the ai/ knowledge layer (kit 0.3.0) | /cold-start kit workflow (.claude/commands/cold-start.md, git-ignored) | — | — | — | uncommitted (branch dev-ai, base 21834e82e) | `ai/guide/MODULE_MAP.md` `ai/guide/PROJECT_OVERVIEW.md` `ai/guide/ARCHITECTURE.md` `ai/guide/CONVENTIONS.md` `ai/guide/FEATURE_MAP.md` `ai/analysis/diagrams/package-deps.mmd` `ai/analysis/diagrams/domain-core.mmd` `ai/analysis/diagrams/seam.mmd` | in-review | [inferred] |
