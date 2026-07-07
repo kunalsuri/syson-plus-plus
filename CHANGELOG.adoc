@@ -27,6 +27,7 @@ It has long been unused by Sirius Web itself (since the transition to MUI).
 
 === Bug fixes
 
+- https://github.com/eclipse-syson/syson/issues/2264[#2264] [services] Fix connection interface end names dropped on textual SysML export.
 - https://github.com/eclipse-syson/syson/issues/2232[#2232] [configuration] Fix a serialization problem of the View models of SysON representations.
 - https://github.com/eclipse-syson/syson/issues/2237[#2237] [diagrams] Fix the item label inside `frames`, `require constraints`, and `assume constraints` compartments.
 - https://github.com/eclipse-syson/syson/issues/2291[#2291] [diagrams] Fix item label for constraint to show their name and expression value between braces (if present).
@@ -39,6 +40,10 @@ It has long been unused by Sirius Web itself (since the transition to MUI).
 - https://github.com/eclipse-syson/syson/issues/2320[#2320] [diagrams] Add an explicit warning message when user tries to reconnect one Actor's edge to another Actor.
 - https://github.com/eclipse-syson/syson/issues/2329[#2329] [import] Fix importing requirement (and sub-requirement) a text.
 - https://github.com/eclipse-syson/syson/issues/2336[#2336] [details] Fix _Edit expression_ modal when the selected element is a `FeatureValue`
+- https://github.com/eclipse-syson/syson/issues/2221[#2221] [explorer] Fix the initial direct edit value of an _Explorer_ tree item whose element has no declared name (for example a `Dependency`).
+The initial value is now an empty string instead of the computed display label, so validating it without changes no longer writes the display label into the element's declared name.
+- https://github.com/eclipse-syson/syson/issues/2342[#2342] [diagrams] Fix the creation of `Succession` and `Transition` elements from _New Succession_ and _New Transition_ graphical edge tools.
+The problem was that the `Succession` and `Transition` were created in the wrong container, which was the `ViewUsage` instead of the common ancestor `Element` containing the source and target.
 
 === Improvements
 
