@@ -91,6 +91,8 @@ coverage/
 
 # ANTLR
 .antlr
+backend/services/syson-direct-edit-grammar/src/main/java/org/eclipse/syson/direct/edit/grammars/DirectEdit*
+
 
 # Playwright
 test-results/
@@ -112,6 +114,9 @@ AGENTS.md
 .project
 .classpath
 .settings/
+org.eclipse.*
+*.project
+*.classpath
 
 # VS Code
 .vscode/
