@@ -292,8 +292,8 @@
           Checks all dependencies, installs missing tools, and compiles the backend (~5–15 min on first run).
         </p>
         <div class="code-wrap">
-          <pre>.\scripts-spp\setup-dev.ps1</pre>
-          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\setup-dev.ps1')">Copy</button>
+          <pre>.\scripts-spp\win\dev-setup.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\win\\dev-setup.ps1')">Copy</button>
         </div>
       </div>
 
@@ -304,8 +304,8 @@
           Starts database, backend, and frontend in order. Assumes the project is already built.
         </p>
         <div class="code-wrap">
-          <pre>.\scripts-spp\start-dev.ps1</pre>
-          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\start-dev.ps1')">Copy</button>
+          <pre>.\scripts-spp\win\dev-start.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\win\\dev-start.ps1')">Copy</button>
         </div>
       </div>
 
@@ -314,8 +314,8 @@
     <div class="card" style="margin-top:16px;">
       <h3 style="margin-bottom:12px;">Stop everything</h3>
       <div class="code-wrap">
-        <pre>.\scripts-spp\stop-dev.ps1</pre>
-        <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\stop-dev.ps1')">Copy</button>
+        <pre>.\scripts-spp\win\dev-stop.ps1</pre>
+        <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\win\\dev-stop.ps1')">Copy</button>
       </div>
       <p style="font-size:0.84rem;color:var(--text-muted);margin-top:8px;margin-bottom:0;">
         Safe stop: only kills the SysON++ Java process and the Vite server. Does <strong>not</strong> touch IntelliJ, VS Code, or any other running application.
@@ -369,7 +369,7 @@
             <td><strong>Maven</strong></td>
             <td>3.9+</td>
             <td><code>mvn --version</code></td>
-            <td><code>setup-dev.ps1</code> installs it automatically</td>
+            <td><code>dev-setup.ps1</code> installs it automatically</td>
           </tr>
           <tr>
             <td><strong>Docker Desktop</strong></td>
@@ -386,7 +386,7 @@
       <div>
         <strong>GitHub Personal Access Token required for first build.</strong><br/>
         Maven downloads Sirius Web packages from GitHub Package Registry.
-        Before running <code>setup-dev.ps1</code> for the first time, set your token:<br/><br/>
+        Before running <code>dev-setup.ps1</code> for the first time, set your token:<br/><br/>
         <code>$env:PASSWORD = 'your-github-pat-here'</code><br/><br/>
         Create a token at <strong>github.com → Settings → Developer settings → Personal access tokens</strong>.
         Enable the <code>read:packages</code> scope.
@@ -399,7 +399,7 @@
     <h2><span class="icon">📁</span> What Each Script Does</h2>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\start-dev.ps1</span>
+      <span class="script-tag">scripts-spp\win\dev-start.ps1</span>
       <div>
         <p><strong>Daily orchestrator.</strong> Starts all three services in order — database first, then backend, then frontend. Waits for each service to be ready before starting the next. Use this every day.</p>
         <p class="when">Use: every time you sit down to work.</p>
@@ -407,7 +407,7 @@
     </div>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\setup-dev.ps1</span>
+      <span class="script-tag">scripts-spp\win\dev-setup.ps1</span>
       <div>
         <p><strong>First-time setup.</strong> Checks and installs all dependencies, runs the Maven build (~5–15 min), installs npm packages, then starts all services. Use this once when setting up a new machine.</p>
         <p class="when">Use: once on a new machine, or after a major dependency change.</p>
@@ -415,7 +415,7 @@
     </div>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\stop-dev.ps1</span>
+      <span class="script-tag">scripts-spp\win\dev-stop.ps1</span>
       <div>
         <p><strong>Safe shutdown.</strong> Stops only the SysON++ Java process (matched by JAR name), the Vite server (matched by port 5173), and pauses the PostgreSQL container. Will not touch any other application.</p>
         <p class="when">Use: when you are done working.</p>
@@ -423,7 +423,7 @@
     </div>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\start-db.ps1</span>
+      <span class="script-tag">scripts-spp\win\start-db.ps1</span>
       <div>
         <p><strong>Database only.</strong> Starts the PostgreSQL Docker container and waits for it to be ready on port 5432.</p>
         <p class="when">Use: if only the database needs to be restarted.</p>
@@ -431,7 +431,7 @@
     </div>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\start-backend.ps1</span>
+      <span class="script-tag">scripts-spp\win\start-backend.ps1</span>
       <div>
         <p><strong>Backend only.</strong> Starts the Spring Boot JAR as a background process. Logs go to <code>%TEMP%\sysonpp-backend.log</code>. Waits up to 120 seconds for port 8080.</p>
         <p class="when">Use: after a Java code change and rebuild.</p>
@@ -439,7 +439,7 @@
     </div>
 
     <div class="script-card">
-      <span class="script-tag">scripts-spp\start-frontend.ps1</span>
+      <span class="script-tag">scripts-spp\win\start-frontend.ps1</span>
       <div>
         <p><strong>Frontend only.</strong> Activates fnm Node v22, then starts the Vite dev server via <code>turbo run start</code>. Logs go to <code>%TEMP%\sysonpp-frontend.log</code>. Waits up to 60 seconds for port 5173.</p>
         <p class="when">Use: after a TypeScript/React change when the backend is already running.</p>
@@ -530,7 +530,7 @@ node --version   # should print v22.16.0</pre>
       <div class="trouble-a">
         <p>The Maven build downloads Sirius Web packages from GitHub Package Registry and requires a Personal Access Token (PAT).</p>
         <div class="code-wrap">
-          <pre># In your PowerShell session before running setup-dev.ps1:
+          <pre># In your PowerShell session before running dev-setup.ps1:
 $env:PASSWORD = 'ghp_your_token_here'</pre>
           <button class="copy-btn" onclick="copy(this, '$env:PASSWORD = \'ghp_your_token_here\'')">Copy</button>
         </div>
@@ -561,8 +561,8 @@ $env:PASSWORD = 'ghp_your_token_here'</pre>
       <div class="trouble-a">
         <p>The JAR is produced by the Maven build. If you cloned a fresh copy of the repo, or after a major version change, you must build first.</p>
         <div class="code-wrap">
-          <pre>.\scripts-spp\setup-dev.ps1</pre>
-          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\setup-dev.ps1')">Copy</button>
+          <pre>.\scripts-spp\win\dev-setup.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\win\\dev-setup.ps1')">Copy</button>
         </div>
         <p>This can take 5–15 minutes on the first run as it downloads all Maven dependencies.</p>
       </div>
@@ -576,9 +576,9 @@ $env:PASSWORD = 'ghp_your_token_here'</pre>
       <div class="trouble-a">
         <p>Another process is occupying the port. Run the stop script first, then try again.</p>
         <div class="code-wrap">
-          <pre>.\scripts-spp\stop-dev.ps1
-.\scripts-spp\start-dev.ps1</pre>
-          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\stop-dev.ps1\n.\\scripts-spp\\start-dev.ps1')">Copy</button>
+          <pre>.\scripts-spp\win\dev-stop.ps1
+.\scripts-spp\win\dev-start.ps1</pre>
+          <button class="copy-btn" onclick="copy(this, '.\\scripts-spp\\win\\dev-stop.ps1\n.\\scripts-spp\\win\\dev-start.ps1')">Copy</button>
         </div>
         <p>To find what process owns a port: <code>Get-NetTCPConnection -LocalPort 8080 -State Listen</code></p>
       </div>

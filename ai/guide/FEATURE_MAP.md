@@ -68,6 +68,6 @@
 ### AI knowledge layer (OURS)  `[inferred]`
 - **Business goal:** make this fork legible and safe for AI coding agents (the actual research object of SysON++)
 - **Touches:** `ai/`, `scripts-spp/`, `.github/workflows/ai-check.yml`, `.cursor/rules`, `.github/prompts`, `.github/chatmodes`, `README.md`
-- **Verify with:** ai-fication-kit verify (CI) or `scripts-spp/verify-ai-docs.ps1` locally
+- **Verify with:** ai-fication-kit verify (CI) or `scripts-spp/win/verify-ai-docs.ps1` locally
 - **Gotchas:** everything in ai/ is `[inferred]` until a human flips it; agents never flip the tag
 - **Related:** — (meta-layer over all other features)

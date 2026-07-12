@@ -3,12 +3,12 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Full ai/ knowledge-layer audit — runs backend and frontend verification in sequence.
+    Full ai/ knowledge-layer audit - runs backend and frontend verification in sequence.
 
 .DESCRIPTION
     Convenience wrapper that calls:
-      1. verify-ai-docs-backend.ps1   — Java / GraphQL / Grammar claims
-      2. verify-ai-docs-frontend.ps1  — TypeScript / TSX claims
+      1. verify-ai-docs-backend.ps1   - Java / GraphQL / Grammar claims
+      2. verify-ai-docs-frontend.ps1  - TypeScript / TSX claims
 
     Reports are written to ai/analysis/audit-reports/:
       BACKEND_VERIFICATION_REPORT.md
@@ -19,10 +19,10 @@
       .\scripts-spp\win\verify-ai-docs-frontend.ps1
 
 .PARAMETER GenerateOnly
-    Passed through to both subscripts — update manifests only, skip verification.
+    Passed through to both subscripts - update manifests only, skip verification.
 
 .PARAMETER VerifyOnly
-    Passed through to both subscripts — verify existing manifests, skip re-parsing.
+    Passed through to both subscripts - verify existing manifests, skip re-parsing.
 
 .PARAMETER RepoRoot
     Repository root. Defaults to the parent of the scripts-spp/ directory.
@@ -36,21 +36,25 @@
 param(
     [switch]$GenerateOnly,
     [switch]$VerifyOnly,
-    [string]$RepoRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
+    [string]$RepoRoot
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrEmpty($RepoRoot)) {
+    $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+}
 
 $backendScript  = Join-Path $PSScriptRoot "verify-ai-docs-backend.ps1"
 $frontendScript = Join-Path $PSScriptRoot "verify-ai-docs-frontend.ps1"
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║     Full ai/docs Audit — SysON++            ║" -ForegroundColor Magenta
-Write-Host "╚══════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host "+----------------------------------------------+" -ForegroundColor Magenta
+Write-Host "|     Full ai/docs Audit - SysON++            |" -ForegroundColor Magenta
+Write-Host "+----------------------------------------------+" -ForegroundColor Magenta
 Write-Host ""
 
-# ── 1. Backend ────────────────────────────────────────────────────────────────
+# -- 1. Backend ----------------------------------------------------------------
 
 $params = @{ RepoRoot = $RepoRoot }
 if ($GenerateOnly.IsPresent) { $params["GenerateOnly"] = $true }
@@ -58,17 +62,17 @@ if ($VerifyOnly.IsPresent)   { $params["VerifyOnly"]   = $true }
 
 & $backendScript @params
 
-# ── 2. Frontend ───────────────────────────────────────────────────────────────
+# -- 2. Frontend ---------------------------------------------------------------
 
 & $frontendScript @params
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+# -- Summary -------------------------------------------------------------------
 
 $reportsDir = Join-Path (Join-Path $RepoRoot "ai\analysis") "audit-reports"
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║              FULL AUDIT DONE                ║" -ForegroundColor Magenta
-Write-Host "╚══════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host "+----------------------------------------------+" -ForegroundColor Magenta
+Write-Host "|              FULL AUDIT DONE                |" -ForegroundColor Magenta
+Write-Host "+----------------------------------------------+" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "  Reports written to: $reportsDir" -ForegroundColor Cyan
 Write-Host "    BACKEND_VERIFICATION_REPORT.md"

@@ -1,10 +1,11 @@
-﻿# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
+# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
 #Requires -Version 5.1
 # Starts the SysON++ PostgreSQL database container.
-# The container is paused on stop — it is never deleted by stop-dev.ps1.
+# The container is paused on stop - it is never deleted by dev-stop.ps1.
 
 $SCRIPT_DIR   = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ROOT_DIR     = Split-Path -Parent $SCRIPT_DIR
+$SPP_DIR      = Split-Path -Parent $SCRIPT_DIR
+$ROOT_DIR     = Split-Path -Parent $SPP_DIR
 $COMPOSE_FILE = Join-Path $ROOT_DIR "backend\application\syson-application\docker-compose.yml"
 $DB_PORT      = 5432
 

@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
+# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
 # Licensed under the Eclipse Public License v2.0 (EPL-2.0)
 #Requires -Version 5.1
 <#
@@ -12,8 +12,8 @@
       - ai/analysis/audit-reports/VERIFICATION_MANIFEST_FRONTEND.json  (structured claims)
       - ai/analysis/audit-reports/FRONTEND_VERIFICATION_REPORT.md      (human-readable results)
 
-    Phase 1 — Generate: parse Markdown → write / merge manifest.
-    Phase 2 — Verify:   scan frontend/ once, check every claim, write report.
+    Phase 1 - Generate: parse Markdown -> write / merge manifest.
+    Phase 2 - Verify:   scan frontend/ once, check every claim, write report.
     Both phases run by default.
 
 .PARAMETER GenerateOnly
@@ -26,18 +26,22 @@
     Repository root. Defaults to the parent of the scripts-spp/ directory.
 
 .EXAMPLE
-    .\scripts-spp\verify-ai-docs-frontend.ps1
-    .\scripts-spp\verify-ai-docs-frontend.ps1 -GenerateOnly
-    .\scripts-spp\verify-ai-docs-frontend.ps1 -VerifyOnly
+    .\scripts-spp\win\verify-ai-docs-frontend.ps1
+    .\scripts-spp\win\verify-ai-docs-frontend.ps1 -GenerateOnly
+    .\scripts-spp\win\verify-ai-docs-frontend.ps1 -VerifyOnly
 #>
 [CmdletBinding()]
 param(
     [switch]$GenerateOnly,
     [switch]$VerifyOnly,
-    [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent)
+    [string]$RepoRoot
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrEmpty($RepoRoot)) {
+    $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+}
 
 $analysisDir  = Join-Path $RepoRoot "ai\analysis"
 $reportsDir   = Join-Path $analysisDir "audit-reports"
@@ -46,7 +50,7 @@ $reportFile    = Join-Path $reportsDir "FRONTEND_VERIFICATION_REPORT.md"
 
 if (-not (Test-Path $reportsDir)) { New-Item -ItemType Directory -Path $reportsDir | Out-Null }
 
-# Catalog files that contain frontend claims — full paths split by folder after 2026-06-08 restructure.
+# Catalog files that contain frontend claims - full paths split by folder after 2026-06-08 restructure.
 # FEATURE_CATALOG.md (master) has both backend and frontend; we extract only TS/TSX from it.
 $CatalogFilePaths = @(
     (Join-Path $analysisDir "FEATURE_CATALOG.md"),
@@ -60,7 +64,7 @@ $TsScanDirs = @(
     "integration-tests-playwright"
 )
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# --- Helpers ------------------------------------------------------------------
 
 function Get-GitCommit {
     try { return (git -C $RepoRoot rev-parse --short HEAD 2>$null).Trim() }
@@ -74,7 +78,7 @@ function Get-Confidence {
     return "unknown"
 }
 
-# ─── Phase 1: Extract frontend claims from Markdown ───────────────────────────
+# --- Phase 1: Extract frontend claims from Markdown ---------------------------
 
 function Extract-FrontendClaims {
     param([string]$Content, [string]$SourceFile)
@@ -84,7 +88,7 @@ function Extract-FrontendClaims {
 
     foreach ($line in ($Content -split "`n")) {
 
-        # TypeScript / TSX files — bare: `FileName.tsx`  OR path: `path/to/FileName.tsx`
+        # TypeScript / TSX files - bare: `FileName.tsx`  OR path: `path/to/FileName.tsx`
         # The path-prefix group is non-capturing; the filename is always captured in group 1.
         foreach ($m in [regex]::Matches($line, '`(?:[A-Za-z0-9_.-]+/)*([A-Za-z][A-Za-z0-9_.-]+\.tsx?)`')) {
             $fn = $m.Groups[1].Value
@@ -110,7 +114,7 @@ function Extract-FrontendClaims {
     return $claims
 }
 
-# ─── Phase 2: Single-pass codebase indexing ───────────────────────────────────
+# --- Phase 2: Single-pass codebase indexing -----------------------------------
 
 function Build-FileIndex {
     param([string]$SearchDir, [string[]]$Extensions, [string]$Label)
@@ -139,7 +143,7 @@ function Build-FileIndex {
     return $index
 }
 
-# ─── Phase 3: Verify each claim ───────────────────────────────────────────────
+# --- Phase 3: Verify each claim -----------------------------------------------
 
 function Resolve-Claim {
     param([PSCustomObject]$Claim, [hashtable]$TsIdx)
@@ -148,7 +152,7 @@ function Resolve-Claim {
     # not a real file. Treat as informational, not an error.
     if ($Claim.fileName -match 'Xxx') {
         $Claim.status = "pattern_template"
-        $Claim.note   = "Template placeholder — 'Xxx' replaced by actual node type name in real files"
+        $Claim.note   = "Template placeholder - 'Xxx' replaced by actual node type name in real files"
         return $Claim
     }
 
@@ -164,17 +168,17 @@ function Resolve-Claim {
     } else {
         $Claim.status  = "confirmed_multiple"
         $Claim.foundAt = ($entry -join " | ")
-        $Claim.note    = "Filename is not unique — $($entry.Count) matches found"
+        $Claim.note    = "Filename is not unique - $($entry.Count) matches found"
     }
     return $Claim
 }
 
-# ─── Phase 4: Coverage gap analysis ──────────────────────────────────────────
+# --- Phase 4: Coverage gap analysis ------------------------------------------
 
 function Get-FrontendCoverageStats {
     param([hashtable]$TsIdx, [array]$Claims)
 
-    # TSX components (React components) — exclude test and story files
+    # TSX components (React components) - exclude test and story files
     $allTsx = $TsIdx.Keys | Where-Object {
         $_ -match "\.tsx$" -and $_ -notmatch "\.spec\.|\.test\.|\.stories\."
     } | Sort-Object
@@ -182,7 +186,7 @@ function Get-FrontendCoverageStats {
     $docTsx = @($Claims | Where-Object { $_.type -eq "tsx" -and $_.status -like "confirmed*" } |
                 Select-Object -ExpandProperty fileName)
 
-    # TypeScript hooks/utilities (.ts files — hooks, converters, handlers)
+    # TypeScript hooks/utilities (.ts files - hooks, converters, handlers)
     $allTs = $TsIdx.Keys | Where-Object {
         $_ -match "\.ts$" -and $_ -notmatch "\.d\.ts$|\.spec\.|\.test\.|config\.ts$"
     } | Sort-Object
@@ -200,7 +204,7 @@ function Get-FrontendCoverageStats {
     }
 }
 
-# ─── Phase 5: Write frontend report ───────────────────────────────────────────
+# --- Phase 5: Write frontend report -------------------------------------------
 
 function Write-FrontendReport {
     param([array]$Claims, [PSCustomObject]$Cov, [string]$Commit)
@@ -217,13 +221,13 @@ function Write-FrontendReport {
 
     $sb = [System.Text.StringBuilder]::new()
     $null = $sb.AppendLine("<!-- Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved. -->")
-    $null = $sb.AppendLine("# Frontend Verification Report — SysON++")
+    $null = $sb.AppendLine("# Frontend Verification Report - SysON++")
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("> **Generated:** $now")
     $null = $sb.AppendLine("> **Repo commit:** ``$Commit``")
     $null = $sb.AppendLine("> **Manifest:** ``ai/analysis/audit-reports/VERIFICATION_MANIFEST_FRONTEND.json``")
-    $null = $sb.AppendLine("> **Scope:** TypeScript components (.tsx) · Hooks & utilities (.ts)")
-    $null = $sb.AppendLine("> **Scanned directories:** ``frontend/`` · ``integration-tests-cypress/`` · ``integration-tests-playwright/``")
+    $null = $sb.AppendLine("> **Scope:** TypeScript components (.tsx) . Hooks & utilities (.ts)")
+    $null = $sb.AppendLine("> **Scanned directories:** ``frontend/`` . ``integration-tests-cypress/`` . ``integration-tests-playwright/``")
     $null = $sb.AppendLine("> **Total claims checked:** $total")
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("---")
@@ -232,9 +236,9 @@ function Write-FrontendReport {
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("| Status | Count | % of claims |")
     $null = $sb.AppendLine("|---|---|---|")
-    $null = $sb.AppendLine("| ✅ Confirmed (file found in frontend/) | $($confirmed.Count) | $(&$Pct $confirmed.Count $total) |")
-    $null = $sb.AppendLine("| ❌ Not found — fix or remove from catalog | $($notFound.Count) | $(&$Pct $notFound.Count $total) |")
-    $null = $sb.AppendLine("| 📐 Pattern template (intentional Xxx placeholder) | $($patterns.Count) | $(&$Pct $patterns.Count $total) |")
+    $null = $sb.AppendLine("| [OK] Confirmed (file found in frontend/) | $($confirmed.Count) | $(&$Pct $confirmed.Count $total) |")
+    $null = $sb.AppendLine("| [FAIL] Not found - fix or remove from catalog | $($notFound.Count) | $(&$Pct $notFound.Count $total) |")
+    $null = $sb.AppendLine("| [Patterns] Pattern template (intentional Xxx placeholder) | $($patterns.Count) | $(&$Pct $patterns.Count $total) |")
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("### Frontend catalog coverage")
     $null = $sb.AppendLine("")
@@ -251,7 +255,7 @@ function Write-FrontendReport {
     # Not-found
     if ($notFound.Count -gt 0) {
         $null = $sb.AppendLine("")
-        $null = $sb.AppendLine("## ❌ Not Found — Fix These ($($notFound.Count))")
+        $null = $sb.AppendLine("## [FAIL] Not Found - Fix These ($($notFound.Count))")
         $null = $sb.AppendLine("")
         $null = $sb.AppendLine("> These names appear in the ai/ catalogs but **no matching file exists** in ``frontend/``.")
         $null = $sb.AppendLine("> They are likely hallucinated, renamed, or deleted. Open the source catalog and fix or delete each row.")
@@ -268,11 +272,11 @@ function Write-FrontendReport {
     # Pattern templates
     if ($patterns.Count -gt 0) {
         $null = $sb.AppendLine("")
-        $null = $sb.AppendLine("## 📐 Pattern Templates ($($patterns.Count) entries)")
+        $null = $sb.AppendLine("## [Patterns] Pattern Templates ($($patterns.Count) entries)")
         $null = $sb.AppendLine("")
         $null = $sb.AppendLine("> These use ``Xxx`` as a placeholder documenting the Node Component Triad Pattern.")
         $null = $sb.AppendLine("> Replace ``Xxx`` with a node type name (``Package``, ``Note``, ``ViewFrame``, ``ImportedPackage``) to get actual files.")
-        $null = $sb.AppendLine("> All actual node-type files are confirmed ✅ in the list above.")
+        $null = $sb.AppendLine("> All actual node-type files are confirmed [OK] in the list above.")
         $null = $sb.AppendLine("")
         $null = $sb.AppendLine("| Template | Source |")
         $null = $sb.AppendLine("|---|---|")
@@ -283,10 +287,10 @@ function Write-FrontendReport {
         $null = $sb.AppendLine("---")
     }
 
-    # Coverage gaps — TSX
+    # Coverage gaps - TSX
     if ($Cov.tsxGaps.Count -gt 0) {
         $null = $sb.AppendLine("")
-        $null = $sb.AppendLine("## Coverage Gaps — React Components Not in Catalog ($($Cov.tsxGaps.Count))")
+        $null = $sb.AppendLine("## Coverage Gaps - React Components Not in Catalog ($($Cov.tsxGaps.Count))")
         $null = $sb.AppendLine("")
         $null = $sb.AppendLine("> These ``.tsx`` files exist in ``frontend/`` but are **not mentioned** in any ai/ knowledge file.")
         $null = $sb.AppendLine("")
@@ -295,12 +299,12 @@ function Write-FrontendReport {
         $null = $sb.AppendLine("---")
     }
 
-    # Coverage gaps — TS hooks
+    # Coverage gaps - TS hooks
     if ($Cov.tsGaps.Count -gt 0) {
         $showN = [math]::Min($Cov.tsGaps.Count, 60)
         $note  = if ($Cov.tsGaps.Count -gt 60) { "Top $showN of $($Cov.tsGaps.Count) shown." } else { "All $($Cov.tsGaps.Count) shown." }
         $null = $sb.AppendLine("")
-        $null = $sb.AppendLine("## Coverage Gaps — TypeScript Hooks & Utilities Not in Catalog ($($Cov.tsGaps.Count))")
+        $null = $sb.AppendLine("## Coverage Gaps - TypeScript Hooks & Utilities Not in Catalog ($($Cov.tsGaps.Count))")
         $null = $sb.AppendLine("")
         $null = $sb.AppendLine("> These ``.ts`` files (hooks, converters, handlers, types) exist in ``frontend/`` but are not in any ai/ knowledge file. $note")
         $null = $sb.AppendLine("")
@@ -314,16 +318,16 @@ function Write-FrontendReport {
     $confirmedTs   = @($confirmed | Where-Object { $_.type -eq "typescript" })
 
     $null = $sb.AppendLine("")
-    $null = $sb.AppendLine("## ✅ Confirmed Claims ($($confirmed.Count))")
+    $null = $sb.AppendLine("## [OK] Confirmed Claims ($($confirmed.Count))")
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("<details>")
-    $null = $sb.AppendLine("<summary>Expand — React components ($($confirmedTsx.Count)) and TypeScript hooks/utilities ($($confirmedTs.Count))</summary>")
+    $null = $sb.AppendLine("<summary>Expand - React components ($($confirmedTsx.Count)) and TypeScript hooks/utilities ($($confirmedTs.Count))</summary>")
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("| File | Type | Confidence | Source | Found At |")
     $null = $sb.AppendLine("|---|---|---|---|---|")
     foreach ($c in ($confirmed | Sort-Object type, fileName)) {
-        $at   = if ($c.foundAt) { "``$($c.foundAt)``" } else { "—" }
-        $note = if ($c.note)    { " ⚠️ $($c.note)"    } else { "" }
+        $at   = if ($c.foundAt) { "``$($c.foundAt)``" } else { "-" }
+        $note = if ($c.note)    { " [WARN] $($c.note)"    } else { "" }
         $null = $sb.AppendLine("| ``$($c.fileName)`` | $($c.type) | $($c.confidence) | $($c.sourceFile) | $at$note |")
     }
     $null = $sb.AppendLine("")
@@ -335,24 +339,24 @@ function Write-FrontendReport {
     $null = $sb.AppendLine("")
     $null = $sb.AppendLine("Automated checks verify **file existence only**. Descriptions require human eyes:")
     $null = $sb.AppendLine("")
-    $null = $sb.AppendLine("- [ ] **Fix every ❌ Not Found** — open the source catalog, correct the filename or delete the row.")
-    $null = $sb.AppendLine("- [ ] **Audit ``[inferred]`` descriptions** — open each confirmed-but-inferred component and verify")
+    $null = $sb.AppendLine("- [ ] **Fix every [FAIL] Not Found** - open the source catalog, correct the filename or delete the row.")
+    $null = $sb.AppendLine("- [ ] **Audit ``[inferred]`` descriptions** - open each confirmed-but-inferred component and verify")
     $null = $sb.AppendLine("       the stated role is accurate. Mark ``[verified]`` in the catalog when done.")
-    $null = $sb.AppendLine("- [ ] **Known bug** — ``SysMLViewFrameNodePaletteAppearanceSection.canHandle`` checks for")
-    $null = $sb.AppendLine("       ``'sysMLNoteNode'`` instead of ``'sysMLViewFrameNode'`` → appearance panel never triggers.")
+    $null = $sb.AppendLine("- [ ] **Known bug** - ``SysMLViewFrameNodePaletteAppearanceSection.canHandle`` checks for")
+    $null = $sb.AppendLine("       ``'sysMLNoteNode'`` instead of ``'sysMLViewFrameNode'`` -> appearance panel never triggers.")
     $null = $sb.AppendLine("       See FEATURE_MAP.md for details.")
-    $null = $sb.AppendLine("- [ ] **Review Coverage Gaps** — decide if undocumented TSX/TS files belong in the catalog.")
-    $null = $sb.AppendLine("- [ ] **Re-run** after fixes: ``.\scripts-spp\verify-ai-docs-frontend.ps1``")
+    $null = $sb.AppendLine("- [ ] **Review Coverage Gaps** - decide if undocumented TSX/TS files belong in the catalog.")
+    $null = $sb.AppendLine("- [ ] **Re-run** after fixes: ``.\scripts-spp\win\verify-ai-docs-frontend.ps1``")
 
     Set-Content -Path $reportFile -Value $sb.ToString() -Encoding UTF8
 }
 
-# ═══ Main ═════════════════════════════════════════════════════════════════════
+# --- Main ---------------------------------------------------------------------
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║  Frontend Verification Tool — SysON++       ║" -ForegroundColor Cyan
-Write-Host "╚══════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "+----------------------------------------------+" -ForegroundColor Cyan
+Write-Host "|  Frontend Verification Tool - SysON++       |" -ForegroundColor Cyan
+Write-Host "+----------------------------------------------+" -ForegroundColor Cyan
 Write-Host "  Repo: $RepoRoot"
 Write-Host ""
 
@@ -361,7 +365,7 @@ $runVerify   = -not $GenerateOnly.IsPresent
 
 $allClaims = [System.Collections.Generic.List[PSCustomObject]]::new()
 
-# ── Phase 1: Extract frontend claims ─────────────────────────────────────────
+# -- Phase 1: Extract frontend claims -----------------------------------------
 
 if ($runGenerate) {
     Write-Host "[Phase 1/4] Extracting frontend claims from ai/ knowledge-layer Markdown..." -ForegroundColor Yellow
@@ -379,12 +383,12 @@ if ($runGenerate) {
         foreach ($c in $extracted) {
             if ($globalSeen.Add($c.id)) { $allClaims.Add($c); $added++ }
         }
-        Write-Host "    $fn  →  $added claims"
+        Write-Host "    $fn  ->  $added claims"
     }
 
     Write-Host "  Total unique frontend claims: $($allClaims.Count)"
 
-    # Merge with existing manifest — preserve prior verification status
+    # Merge with existing manifest - preserve prior verification status
     if (Test-Path $manifestFile) {
         try {
             $prior = Get-Content $manifestFile -Raw | ConvertFrom-Json
@@ -399,26 +403,26 @@ if ($runGenerate) {
                     $preserved++
                 }
             }
-            Write-Host "  Merged with prior manifest — $preserved prior results preserved."
+            Write-Host "  Merged with prior manifest - $preserved prior results preserved."
         } catch {
             Write-Host "  Warning: existing manifest could not be parsed; starting fresh." -ForegroundColor DarkYellow
         }
     }
 
     $manifest = [ordered]@{
-        _comment    = "Auto-generated by scripts-spp/verify-ai-docs-frontend.ps1 — safe to edit manually"
+        _comment    = "Auto-generated by scripts-spp/win/verify-ai-docs-frontend.ps1 - safe to edit manually"
         generated   = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         repoCommit  = (Get-GitCommit)
-        scope       = "frontend — TypeScript / TSX"
+        scope       = "frontend - TypeScript / TSX"
         totalClaims = $allClaims.Count
         claims      = @($allClaims)
     }
     $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $manifestFile -Encoding UTF8
     Write-Host ""
-    Write-Host "  ✅ Manifest written: $manifestFile  ($($allClaims.Count) claims)" -ForegroundColor Green
+    Write-Host "  [OK] Manifest written: $manifestFile  ($($allClaims.Count) claims)" -ForegroundColor Green
 }
 
-# ── Phase 2: Load manifest for VerifyOnly ────────────────────────────────────
+# -- Phase 2: Load manifest for VerifyOnly ------------------------------------
 
 if ($runVerify -and $allClaims.Count -eq 0) {
     if (-not (Test-Path $manifestFile)) {
@@ -429,7 +433,7 @@ if ($runVerify -and $allClaims.Count -eq 0) {
     Write-Host "[Loaded frontend manifest: $($allClaims.Count) claims]"
 }
 
-# ── Phase 3: Codebase scan & verify ─────────────────────────────────────────
+# -- Phase 3: Codebase scan & verify -----------------------------------------
 
 if ($runVerify) {
     Write-Host ""
@@ -475,10 +479,10 @@ if ($runVerify) {
 
     # Update manifest with resolved status
     $manifest = [ordered]@{
-        _comment    = "Auto-generated by scripts-spp/verify-ai-docs-frontend.ps1 — safe to edit manually"
+        _comment    = "Auto-generated by scripts-spp/win/verify-ai-docs-frontend.ps1 - safe to edit manually"
         generated   = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
         repoCommit  = (Get-GitCommit)
-        scope       = "frontend — TypeScript / TSX"
+        scope       = "frontend - TypeScript / TSX"
         totalClaims = $resolved.Count
         claims      = @($resolved)
     }
@@ -492,16 +496,16 @@ if ($runVerify) {
     $tsPct     = if ($cov.tsTotal  -gt 0) { [math]::Round($cov.tsDocumented  / $cov.tsTotal  * 100) } else { 0 }
 
     Write-Host ""
-    Write-Host "╔══════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "║          FRONTEND RESULTS                   ║" -ForegroundColor Cyan
-    Write-Host "╚══════════════════════════════════════════════╝"
-    Write-Host ("  ✅ Confirmed   : {0,-5}" -f $confirmed.Count) -ForegroundColor $(if ($notFound.Count -eq 0) { "Green" } else { "White" })
+    Write-Host "+----------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "|          FRONTEND RESULTS                   |" -ForegroundColor Cyan
+    Write-Host "+----------------------------------------------+"
+    Write-Host ("  [OK] Confirmed   : {0,-5}" -f $confirmed.Count) -ForegroundColor $(if ($notFound.Count -eq 0) { "Green" } else { "White" })
     if ($notFound.Count -gt 0) {
-        Write-Host ("  ❌ Not found  : {0,-5}  ← REVIEW THESE IN REPORT" -f $notFound.Count) -ForegroundColor Red
+        Write-Host ("  [FAIL] Not found  : {0,-5}  <- REVIEW THESE IN REPORT" -f $notFound.Count) -ForegroundColor Red
     } else {
-        Write-Host ("  ❌ Not found  : 0     ← all frontend claims verified!") -ForegroundColor Green
+        Write-Host ("  [FAIL] Not found  : 0     <- all frontend claims verified!") -ForegroundColor Green
     }
-    Write-Host ("  📐 Patterns   : {0,-5} (intentional Xxx placeholders)" -f $patterns.Count) -ForegroundColor DarkGray
+    Write-Host ("  [Patterns] Patterns   : {0,-5} (intentional Xxx placeholders)" -f $patterns.Count) -ForegroundColor DarkGray
     Write-Host ("  TSX coverage  : {0} / {1} ({2}%)" -f $cov.tsxDocumented, $cov.tsxTotal, $txPct)
     Write-Host ("  TS coverage   : {0} / {1} ({2}%)" -f $cov.tsDocumented,  $cov.tsTotal,  $tsPct)
     Write-Host ""

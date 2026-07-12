@@ -1,11 +1,12 @@
-﻿# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
+# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
 #Requires -Version 5.1
 # Starts the SysON++ React/Vite frontend on port 5173 as a background process.
 # Uses fnm Node v22 to avoid the nvm4w EPERM issue on Windows.
 # Output is written to: $env:TEMP\sysonpp-frontend.log
 
 $SCRIPT_DIR    = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ROOT_DIR      = Split-Path -Parent $SCRIPT_DIR
+$SPP_DIR       = Split-Path -Parent $SCRIPT_DIR
+$ROOT_DIR      = Split-Path -Parent $SPP_DIR
 $FRONTEND_PORT = 5173
 $NODE_VERSION  = "22.16.0"   # Update here if the project upgrades Node
 $TURBO_EXE     = Join-Path $ROOT_DIR "node_modules\@turbo\windows-64\bin\turbo.exe"
@@ -27,7 +28,7 @@ Write-Host "  Starting React/Vite frontend (port $FRONTEND_PORT)..." -Foreground
 
 if (-not (Test-Path $TURBO_EXE)) {
     Write-FAIL "turbo.exe not found at: $TURBO_EXE"
-    Write-FAIL "Install npm packages first:  .\scripts-spp\setup-dev.ps1"
+    Write-FAIL "Install npm packages first:  .\scripts-spp\win\dev-setup.ps1"
     exit 1
 }
 

@@ -1,8 +1,8 @@
-﻿# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
+# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    SysON++ Developer Setup & Run — one-click Windows launcher.
+    SysON++ Developer Setup & Run - one-click Windows launcher.
 
 .DESCRIPTION
     Checks every required dependency, guides you through any missing
@@ -28,16 +28,16 @@
     Start only the frontend dev server. Assumes the backend is running.
 
 .PARAMETER CheckOnly
-    Check dependencies and exit — do not build or start anything.
+    Check dependencies and exit - do not build or start anything.
 
 .PARAMETER StopAll
     Stop all running SysON++ services (database, backend, frontend).
 
 .EXAMPLE
-    .\scripts-spp\setup-dev.ps1                   # First-time setup and full start
-    .\scripts-spp\setup-dev.ps1 -SkipBuild        # Quick restart (no rebuild)
-    .\scripts-spp\setup-dev.ps1 -CheckOnly        # Verify your environment
-    .\scripts-spp\setup-dev.ps1 -StopAll          # Stop everything
+    .\scripts-spp\win\dev-setup.ps1                   # First-time setup and full start
+    .\scripts-spp\win\dev-setup.ps1 -SkipBuild        # Quick restart (no rebuild)
+    .\scripts-spp\win\dev-setup.ps1 -CheckOnly        # Verify your environment
+    .\scripts-spp\win\dev-setup.ps1 -StopAll          # Stop everything
 #>
 
 [CmdletBinding()]
@@ -53,7 +53,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# ── Pinned versions (from package.json / pom.xml) ─────────
+# -- Pinned versions (from package.json / pom.xml) ---------
 $NODE_MAJOR_REQUIRED   = 22
 $NODE_EXACT_REQUIRED   = "22.16.0"
 $NPM_EXACT_REQUIRED    = "10.9.2"
@@ -69,7 +69,8 @@ $DB_PASSWORD = "test_password"
 $DB_NAME     = "postgres"
 
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ROOT_DIR   = Split-Path -Parent $SCRIPT_DIR
+$SPP_DIR    = Split-Path -Parent $SCRIPT_DIR
+$ROOT_DIR   = Split-Path -Parent $SPP_DIR
 $COMPOSE_FILE = Join-Path $ROOT_DIR "backend\application\syson-application\docker-compose.yml"
 $SETTINGS_XML = Join-Path $ROOT_DIR "settings.xml"
 
@@ -85,7 +86,7 @@ if ($discoveredJar) {
     $BACKEND_JAR = Join-Path $ROOT_DIR "backend\application\syson-application\target\syson-application-$APP_VERSION.jar"
 }
 
-# ── Environment bootstrap ──────────────────────────────────
+# -- Environment bootstrap ----------------------------------
 # Refresh PATH and activate fnm-managed Node on every run so checks are accurate
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
             [System.Environment]::GetEnvironmentVariable("Path", "User")
@@ -123,27 +124,27 @@ if (-not [string]::IsNullOrWhiteSpace($ghUser)) {
     $env:USERNAME = $ghUser
 }
 
-# ── Helper functions ───────────────────────────────────────
+# -- Helper functions ---------------------------------------
 function Write-Banner {
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "  ║         SysON++ — Developer Environment Setup & Run         ║" -ForegroundColor Cyan
-    Write-Host "  ║       Java backend  +  React/TS frontend  +  PostgreSQL      ║" -ForegroundColor Cyan
-    Write-Host "  ╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+    Write-Host "  +--------------------------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "  |         SysON++ - Developer Environment Setup & Run         |" -ForegroundColor Cyan
+    Write-Host "  |       Java backend  +  React/TS frontend  +  PostgreSQL      |" -ForegroundColor Cyan
+    Write-Host "  +--------------------------------------------------------------+" -ForegroundColor Cyan
     Write-Host ""
 }
 
 function Write-Section($title) {
     Write-Host ""
-    Write-Host "  ┌─ $title" -ForegroundColor Cyan
-    Write-Host "  │" -ForegroundColor DarkCyan
+    Write-Host "  +- $title" -ForegroundColor Cyan
+    Write-Host "  |" -ForegroundColor DarkCyan
 }
 
-function Write-OK($msg)   { Write-Host "  │  [✓] $msg" -ForegroundColor Green }
-function Write-WARN($msg) { Write-Host "  │  [!] $msg" -ForegroundColor Yellow }
-function Write-FAIL($msg) { Write-Host "  │  [✗] $msg" -ForegroundColor Red }
-function Write-INFO($msg) { Write-Host "  │      $msg" -ForegroundColor Gray }
-function Write-SectionEnd { Write-Host "  └" -ForegroundColor DarkCyan }
+function Write-OK($msg)   { Write-Host "  |  [OK] $msg" -ForegroundColor Green }
+function Write-WARN($msg) { Write-Host "  |  [!] $msg" -ForegroundColor Yellow }
+function Write-FAIL($msg) { Write-Host "  |  [FAIL] $msg" -ForegroundColor Red }
+function Write-INFO($msg) { Write-Host "  |      $msg" -ForegroundColor Gray }
+function Write-SectionEnd { Write-Host "  +" -ForegroundColor DarkCyan }
 
 function Test-CommandExists($cmd) {
     $null -ne (Get-Command $cmd -ErrorAction SilentlyContinue)
@@ -176,7 +177,7 @@ function Refresh-Path {
 }
 
 function Prompt-YesNo($question) {
-    $ans = Read-Host "  │  $question [Y/n]"
+    $ans = Read-Host "  |  $question [Y/n]"
     return ($ans -ne 'n' -and $ans -ne 'N')
 }
 
@@ -196,7 +197,7 @@ function Wait-ForPort($port, $timeoutSec = 60, $label = "service") {
         Write-Host "." -NoNewline -ForegroundColor Gray
     }
     Write-Host ""
-    Write-WARN "$label did not respond on port $port after ${timeoutSec}s — check the service window for errors."
+    Write-WARN "$label did not respond on port $port after ${timeoutSec}s - check the service window for errors."
     return $false
 }
 
@@ -211,12 +212,12 @@ function Open-ServiceWindow($title, $command, $workDir) {
     }
 }
 
-# ── Stop mode ─────────────────────────────────────────────
+# -- Stop mode ---------------------------------------------
 if ($StopAll) {
     Write-Banner
     Write-Section "Stopping SysON++ services"
 
-    # [1] Backend — match on command line so other JVMs (IntelliJ etc.) are NOT touched
+    # [1] Backend - match on command line so other JVMs (IntelliJ etc.) are NOT touched
     Write-INFO "Stopping SysON++ Java backend..."
     $sysonJava = Get-CimInstance Win32_Process -Filter "Name='java.exe'" |
         Where-Object { $_.CommandLine -like '*syson-application*' }
@@ -236,11 +237,11 @@ if ($StopAll) {
                 Write-OK "Stopped Java on port $BACKEND_PORT (PID $($_.Id))."
             }
         } else {
-            Write-WARN "No SysON++ Java process found — already stopped."
+            Write-WARN "No SysON++ Java process found - already stopped."
         }
     }
 
-    # [2] Frontend — kill only the process owning port 5173, not all node processes
+    # [2] Frontend - kill only the process owning port 5173, not all node processes
     Write-INFO "Stopping SysON++ frontend (port $FRONTEND_PORT)..."
     $port5173 = Get-NetTCPConnection -LocalPort $FRONTEND_PORT -State Listen -ErrorAction SilentlyContinue |
         ForEach-Object { Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue } |
@@ -251,11 +252,11 @@ if ($StopAll) {
             Write-OK "Stopped frontend '$($_.Name)' (PID $($_.Id))."
         }
     } else {
-        Write-WARN "No process on port $FRONTEND_PORT — already stopped."
+        Write-WARN "No process on port $FRONTEND_PORT - already stopped."
     }
 
-    # [3] PostgreSQL — stop only, container stays visible in Docker Desktop
-    # NOTE: 'compose stop' preserves the container. 'compose down' would delete it — do not use.
+    # [3] PostgreSQL - stop only, container stays visible in Docker Desktop
+    # NOTE: 'compose stop' preserves the container. 'compose down' would delete it - do not use.
     Write-INFO "Stopping PostgreSQL container (container preserved, not removed)..."
     if (-not (Test-Path $COMPOSE_FILE)) {
         Write-FAIL "Compose file not found: $COMPOSE_FILE"
@@ -268,14 +269,14 @@ if ($StopAll) {
             if ($LASTEXITCODE -eq 0) {
                 Write-OK "PostgreSQL container stopped (not removed)."
             } else {
-                Write-FAIL "docker compose stop failed — check Docker Desktop."
+                Write-FAIL "docker compose stop failed - check Docker Desktop."
             }
         } else {
-            Write-WARN "Docker daemon not running — skipping."
+            Write-WARN "Docker daemon not running - skipping."
         }
         $ErrorActionPreference = $oldEAP
     } else {
-        Write-WARN "Docker not found — skipping."
+        Write-WARN "Docker not found - skipping."
     }
 
     Write-SectionEnd
@@ -283,12 +284,12 @@ if ($StopAll) {
     exit 0
 }
 
-# ═══════════════════════════════════════════════════════════
-# PHASE 1 — DEPENDENCY CHECK
-# ═══════════════════════════════════════════════════════════
+# -----------------------------------------------------------
+# PHASE 1 - DEPENDENCY CHECK
+# -----------------------------------------------------------
 Clear-Host
 Write-Banner
-Write-Section "Phase 1 of 5 — Dependency Check"
+Write-Section "Phase 1 of 5 - Dependency Check"
 
 # Temporarily set ErrorActionPreference to Continue so stderr from java/mvn doesn't crash the script
 $oldEAP = $ErrorActionPreference
@@ -315,11 +316,11 @@ if (Test-CommandExists "node") {
             Write-OK "Node.js: v$nodeRaw  (exact recommended: v$NODE_EXACT_REQUIRED)"
         }
     } else {
-        Write-FAIL "Node.js: v$nodeRaw found — v$NODE_EXACT_REQUIRED (Node $NODE_MAJOR_REQUIRED) required"
+        Write-FAIL "Node.js: v$nodeRaw found - v$NODE_EXACT_REQUIRED (Node $NODE_MAJOR_REQUIRED) required"
         $missing.Add("nodejs")
     }
 } else {
-    Write-FAIL "Node.js: not found  →  required: v$NODE_EXACT_REQUIRED"
+    Write-FAIL "Node.js: not found  ->  required: v$NODE_EXACT_REQUIRED"
     $missing.Add("nodejs")
 }
 
@@ -340,14 +341,14 @@ if (Test-CommandExists "java") {
         if ($javaMajor -ge $JAVA_MAJOR_REQUIRED) {
             Write-OK "Java: $javaOut"
         } else {
-            Write-FAIL "Java: found v$javaMajor — JDK $JAVA_MAJOR_REQUIRED+ required"
+            Write-FAIL "Java: found v$javaMajor - JDK $JAVA_MAJOR_REQUIRED+ required"
             $missing.Add("java")
         }
     } else {
         Write-WARN "Java: found but could not parse version from: $javaOut"
     }
 } else {
-    Write-FAIL "Java: not found  →  required: JDK $JAVA_MAJOR_REQUIRED"
+    Write-FAIL "Java: not found  ->  required: JDK $JAVA_MAJOR_REQUIRED"
     $missing.Add("java")
 }
 
@@ -367,7 +368,7 @@ if (Test-CommandExists "docker") {
     if ($LASTEXITCODE -eq 0) {
         Write-OK "Docker daemon: running"
     } else {
-        Write-FAIL "Docker daemon: not running — start Docker Desktop first"
+        Write-FAIL "Docker daemon: not running - start Docker Desktop first"
         $missing.Add("docker-daemon")
     }
 } else {
@@ -403,11 +404,11 @@ if ($CheckOnly) {
     exit 0
 }
 
-# ═══════════════════════════════════════════════════════════
-# PHASE 2 — INSTALL MISSING DEPENDENCIES
-# ═══════════════════════════════════════════════════════════
+# -----------------------------------------------------------
+# PHASE 2 - INSTALL MISSING DEPENDENCIES
+# -----------------------------------------------------------
 if ($missing.Count -gt 0) {
-    Write-Section "Phase 2 of 5 — Installing Missing Dependencies"
+    Write-Section "Phase 2 of 5 - Installing Missing Dependencies"
     Write-WARN "Missing: $($missing -join '  |  ')"
     Write-INFO ""
 
@@ -417,8 +418,8 @@ if ($missing.Count -gt 0) {
         switch ($dep) {
 
             "git" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "Git — version control"
+                Write-INFO "------------------------------"
+                Write-INFO "Git - version control"
                 Write-INFO "  winget install --id Git.Git --exact"
                 if (Prompt-YesNo "Install Git via winget?") {
                     Invoke-WinGet "Git.Git"
@@ -426,10 +427,10 @@ if ($missing.Count -gt 0) {
             }
 
             "nodejs" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "Node.js $NODE_EXACT_REQUIRED — JS runtime + npm"
+                Write-INFO "------------------------------"
+                Write-INFO "Node.js $NODE_EXACT_REQUIRED - JS runtime + npm"
                 if (Get-Command fnm -ErrorAction SilentlyContinue) {
-                    Write-INFO "  fnm (Fast Node Manager) detected — will install via fnm"
+                    Write-INFO "  fnm (Fast Node Manager) detected - will install via fnm"
                     if (Prompt-YesNo "Install Node.js $NODE_EXACT_REQUIRED via fnm?") {
                         fnm install $NODE_EXACT_REQUIRED
                         try { fnm env --shell powershell | Out-String | Invoke-Expression } catch { }
@@ -456,8 +457,8 @@ if ($missing.Count -gt 0) {
             }
 
             "java" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "Eclipse Temurin JDK $JAVA_MAJOR_REQUIRED — Java runtime for Spring Boot"
+                Write-INFO "------------------------------"
+                Write-INFO "Eclipse Temurin JDK $JAVA_MAJOR_REQUIRED - Java runtime for Spring Boot"
                 Write-INFO "  winget install --id EclipseAdoptium.Temurin.$JAVA_MAJOR_REQUIRED.JDK"
                 Write-INFO "  Alternatively: https://adoptium.net/"
                 if (Prompt-YesNo "Install Temurin JDK $JAVA_MAJOR_REQUIRED via winget?") {
@@ -467,8 +468,8 @@ if ($missing.Count -gt 0) {
             }
 
             "maven" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "Apache Maven 3.9.x — Java build tool"
+                Write-INFO "------------------------------"
+                Write-INFO "Apache Maven 3.9.x - Java build tool"
                 Write-INFO "  Will download from Apache CDN and install to C:\tools\apache-maven-3.9.16"
                 if (Prompt-YesNo "Install Maven 3.9.16 from Apache CDN?") {
                     $mvnVer = "3.9.16"
@@ -490,21 +491,21 @@ if ($missing.Count -gt 0) {
             }
 
             "docker" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "Docker Desktop — required to run the PostgreSQL database container"
+                Write-INFO "------------------------------"
+                Write-INFO "Docker Desktop - required to run the PostgreSQL database container"
                 Write-INFO "  winget install --id Docker.DockerDesktop"
                 Write-WARN "After Docker Desktop installs, you must RESTART your computer,"
                 Write-WARN "then open Docker Desktop and let it fully start before re-running this script."
                 if (Prompt-YesNo "Install Docker Desktop via winget?") {
                     Invoke-WinGet "Docker.DockerDesktop"
                     Write-WARN "Docker Desktop installed. Please RESTART your computer, then re-run this script."
-                    Write-Host "`n  Exiting — please restart and run again.`n" -ForegroundColor Yellow
+                    Write-Host "`n  Exiting - please restart and run again.`n" -ForegroundColor Yellow
                     exit 0
                 }
             }
 
             "docker-daemon" {
-                Write-INFO "──────────────────────────────"
+                Write-INFO "------------------------------"
                 Write-INFO "Docker Desktop is installed but not running."
                 if (Prompt-YesNo "Would you like to start Docker Desktop automatically?") {
                     $dockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
@@ -529,24 +530,24 @@ if ($missing.Count -gt 0) {
                             Write-OK "Docker daemon is running!"
                         } else {
                             Write-WARN "Docker Desktop started but daemon is not responding yet."
-                            Read-Host "  │  Please check Docker Desktop and press Enter when it is fully ready"
+                            Read-Host "  |  Please check Docker Desktop and press Enter when it is fully ready"
                         }
                     } else {
                         Write-WARN "Docker Desktop executable not found at typical path: $dockerPath"
                         Write-INFO "  Please open Docker Desktop manually."
-                        Read-Host "  │  Press Enter once Docker Desktop is fully started"
+                        Read-Host "  |  Press Enter once Docker Desktop is fully started"
                     }
                 } else {
                     Write-INFO "  Please open Docker Desktop from the Start Menu."
                     Write-INFO "  Wait for the whale icon in the system tray to stop animating."
                     Write-Host ""
-                    Read-Host "  │  Press Enter once Docker Desktop is fully started"
+                    Read-Host "  |  Press Enter once Docker Desktop is fully started"
                 }
             }
 
             "github-token" {
-                Write-INFO "──────────────────────────────"
-                Write-INFO "GitHub Personal Access Token — needed for Maven to download Sirius Web packages"
+                Write-INFO "------------------------------"
+                Write-INFO "GitHub Personal Access Token - needed for Maven to download Sirius Web packages"
                 Write-INFO ""
                 Write-INFO "  Steps to create one:"
                 Write-INFO "  1. Go to: https://github.com/settings/tokens  (or Settings > Developer settings > PAT)"
@@ -557,7 +558,7 @@ if ($missing.Count -gt 0) {
                 Write-INFO "  The username '$ghUser' will be used as the GitHub username."
                 Write-INFO "  If your GitHub username differs, set GITHUB_USERNAME (e.g. `$env:GITHUB_USERNAME = 'user')."
                 Write-INFO ""
-                $secureToken = Read-Host "  │  Paste your GitHub PAT here (input is hidden)" -AsSecureString
+                $secureToken = Read-Host "  |  Paste your GitHub PAT here (input is hidden)" -AsSecureString
                 $plainToken = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
                     [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureToken)
                 )
@@ -600,22 +601,22 @@ if ($missing.Count -gt 0) {
 
     if ($needsRestart) {
         Write-WARN "Some tools were just installed. If you see errors below, open a"
-        Write-WARN "new terminal and re-run the script — PATH needs to refresh."
+        Write-WARN "new terminal and re-run the script - PATH needs to refresh."
     }
 
     Write-OK "All dependencies are now present."
     Write-SectionEnd
 } else {
-    Write-Section "Phase 2 of 5 — Dependencies"
-    Write-OK "All dependencies already installed — skipping install phase."
+    Write-Section "Phase 2 of 5 - Dependencies"
+    Write-OK "All dependencies already installed - skipping install phase."
     Write-SectionEnd
 }
 
-# ═══════════════════════════════════════════════════════════
-# PHASE 3 — START DATABASE
-# ═══════════════════════════════════════════════════════════
+# -----------------------------------------------------------
+# PHASE 3 - START DATABASE
+# -----------------------------------------------------------
 if (-not $FrontendOnly) {
-    Write-Section "Phase 3 of 5 — Starting PostgreSQL Database"
+    Write-Section "Phase 3 of 5 - Starting PostgreSQL Database"
 
     Write-INFO "Using compose file: $COMPOSE_FILE"
     Write-INFO "Starting 'database' service (postgres:15, port $DB_PORT)..."
@@ -644,9 +645,9 @@ if (-not $FrontendOnly) {
     Write-SectionEnd
 }
 
-# ═══════════════════════════════════════════════════════════
-# PHASE 4 — BUILD
-# ═══════════════════════════════════════════════════════════
+# -----------------------------------------------------------
+# PHASE 4 - BUILD
+# -----------------------------------------------------------
 $AutoSkipped = $false
 if (-not $SkipBuild -and -not $ForceBuild) {
     $hasBackendBuild = -not $FrontendOnly -and (Test-Path $BACKEND_JAR)
@@ -662,7 +663,7 @@ if (-not $SkipBuild -and -not $ForceBuild) {
 }
 
 if (-not $SkipBuild) {
-    Write-Section "Phase 4 of 5 — Building"
+    Write-Section "Phase 4 of 5 - Building"
 
     # Frontend deps
     if (-not $BackendOnly) {
@@ -687,7 +688,7 @@ if (-not $SkipBuild) {
     if (-not $FrontendOnly) {
         Write-INFO ""
         Write-INFO "Building Maven backend..."
-        Write-INFO "(First run: downloads ~500 MB of dependencies — takes 5-15 min)"
+        Write-INFO "(First run: downloads ~500 MB of dependencies - takes 5-15 min)"
         Write-INFO "Command: mvn -B clean install -DskipTests -s settings.xml"
         Write-INFO ""
 
@@ -707,7 +708,7 @@ if (-not $SkipBuild) {
 
     Write-SectionEnd
 } else {
-    Write-Section "Phase 4 of 5 — Build"
+    Write-Section "Phase 4 of 5 - Build"
     if ($AutoSkipped) {
         Write-OK "Existing build artifacts found (backend JAR and/or node_modules)."
         Write-INFO "Skipping build phase to start up faster. Use -ForceBuild to compile again."
@@ -726,10 +727,10 @@ if (-not $SkipBuild) {
     Write-SectionEnd
 }
 
-# ═══════════════════════════════════════════════════════════
-# PHASE 5 — RUN SERVICES
-# ═══════════════════════════════════════════════════════════
-Write-Section "Phase 5 of 5 — Starting Services"
+# -----------------------------------------------------------
+# PHASE 5 - RUN SERVICES
+# -----------------------------------------------------------
+Write-Section "Phase 5 of 5 - Starting Services"
 
 if (-not $FrontendOnly) {
     Write-INFO "Launching backend in a new terminal window..."
@@ -791,21 +792,21 @@ if (-not $BackendOnly) {
 
 Write-SectionEnd
 
-# ── Final summary ──────────────────────────────────────────
+# -- Final summary ------------------------------------------
 Write-Host ""
-Write-Host "  ╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "  ║  SysON++ is starting up!                                     ║" -ForegroundColor Green
-Write-Host "  ║                                                              ║" -ForegroundColor Green
-Write-Host "  ║  Frontend app  ->  http://localhost:$FRONTEND_PORT                   ║" -ForegroundColor Green
-Write-Host "  ║  Backend API   ->  http://localhost:$BACKEND_PORT                    ║" -ForegroundColor Green
-Write-Host "  ║  GraphQL       ->  http://localhost:$BACKEND_PORT/api/graphql        ║" -ForegroundColor Green
-Write-Host "  ║  PostgreSQL    ->  localhost:$DB_PORT  (db: $DB_NAME)           ║" -ForegroundColor Green
-Write-Host "  ║                                                              ║" -ForegroundColor Green
-Write-Host "  ║  Watch the new terminal windows for startup progress.        ║" -ForegroundColor Green
-Write-Host "  ╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "  +--------------------------------------------------------------+" -ForegroundColor Green
+Write-Host "  |  SysON++ is starting up!                                     |" -ForegroundColor Green
+Write-Host "  |                                                              |" -ForegroundColor Green
+Write-Host "  |  Frontend app  ->  http://localhost:$FRONTEND_PORT                   |" -ForegroundColor Green
+Write-Host "  |  Backend API   ->  http://localhost:$BACKEND_PORT                    |" -ForegroundColor Green
+Write-Host "  |  GraphQL       ->  http://localhost:$BACKEND_PORT/api/graphql        |" -ForegroundColor Green
+Write-Host "  |  PostgreSQL    ->  localhost:$DB_PORT  (db: $DB_NAME)           |" -ForegroundColor Green
+Write-Host "  |                                                              |" -ForegroundColor Green
+Write-Host "  |  Watch the new terminal windows for startup progress.        |" -ForegroundColor Green
+Write-Host "  +--------------------------------------------------------------+" -ForegroundColor Green
 Write-Host ""
-Write-Host "  To stop everything:  .\scripts-spp\setup-dev.ps1 -StopAll" -ForegroundColor Yellow
-Write-Host "  Fast restart:        .\scripts-spp\setup-dev.ps1 -SkipBuild" -ForegroundColor Yellow
-Write-Host "  Force rebuild:       .\scripts-spp\setup-dev.ps1 -ForceBuild" -ForegroundColor Yellow
-Write-Host "  Check deps only:     .\scripts-spp\setup-dev.ps1 -CheckOnly" -ForegroundColor Yellow
+Write-Host "  To stop everything:  .\scripts-spp\win\dev-setup.ps1 -StopAll" -ForegroundColor Yellow
+Write-Host "  Fast restart:        .\scripts-spp\win\dev-setup.ps1 -SkipBuild" -ForegroundColor Yellow
+Write-Host "  Force rebuild:       .\scripts-spp\win\dev-setup.ps1 -ForceBuild" -ForegroundColor Yellow
+Write-Host "  Check deps only:     .\scripts-spp\win\dev-setup.ps1 -CheckOnly" -ForegroundColor Yellow
 Write-Host ""

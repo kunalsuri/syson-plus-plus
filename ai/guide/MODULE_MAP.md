@@ -104,7 +104,7 @@ reactor is the repo root. Java 21 enforced; Spring Boot parent 4.0.7; Sirius Web
 | Directory | Responsibility (one line) | Entry point | Stability |
 |---|---|---|---|
 | `ai` | The AI knowledge layer: guide (maps), analysis (generated), lab (specs/reviews/ledger) | `ai/INDEX.md` | ours |
-| `scripts-spp` | SysON++ dev tooling: start/stop dev environment (PowerShell), ai-docs verification | `scripts-spp/verify-ai-docs.ps1` | ours |
+| `scripts-spp` | SysON++ dev tooling: start/stop dev environment (PowerShell), ai-docs verification | `scripts-spp/win/verify-ai-docs.ps1` | ours |
 | `.cursor/rules` | Kit-installed Cursor mirrors of the ai/ workflows | `.cursor/rules/ai-knowledge-layer.mdc` | ours |
 | `.github/chatmodes` | Kit-installed Copilot chatmodes mirroring the subagents | `.github/chatmodes/repo-explorer.chatmode.md` | ours |
 | `.github/prompts` | Kit-installed Copilot prompts mirroring the slash commands (plus `.github/copilot-instructions.md`) | `.github/prompts/cold-start.prompt.md` | ours |

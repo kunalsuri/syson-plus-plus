@@ -1,10 +1,11 @@
-﻿# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
+# Copyright (c) 2026 CEA LIST / Kunal Suri. All rights reserved.
 #Requires -Version 5.1
 # Starts the SysON++ Spring Boot backend on port 8080 as a background process.
 # Output is written to: $env:TEMP\sysonpp-backend.log
 
 $SCRIPT_DIR   = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ROOT_DIR     = Split-Path -Parent $SCRIPT_DIR
+$SPP_DIR      = Split-Path -Parent $SCRIPT_DIR
+$ROOT_DIR     = Split-Path -Parent $SPP_DIR
 $BACKEND_PORT = 8080
 $LOG_OUT      = "$env:TEMP\sysonpp-backend.log"
 $LOG_ERR      = "$env:TEMP\sysonpp-backend-err.log"
@@ -16,7 +17,7 @@ function Write-INFO($m) { Write-Host "  [..] $m" -ForegroundColor Gray }
 Write-Host ""
 Write-Host "  Starting Spring Boot backend (port $BACKEND_PORT)..." -ForegroundColor Cyan
 
-# Discover the executable JAR — exclude -sources.jar (no Main-Class manifest)
+# Discover the executable JAR - exclude -sources.jar (no Main-Class manifest)
 $JAR = Get-Item "$ROOT_DIR\backend\application\syson-application\target\syson-application-*.jar" `
     -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -notmatch '-sources\.jar$' } |
@@ -24,7 +25,7 @@ $JAR = Get-Item "$ROOT_DIR\backend\application\syson-application\target\syson-ap
 
 if (-not $JAR) {
     Write-FAIL "Backend JAR not found under backend\application\syson-application\target\"
-    Write-FAIL "Build the project first:  .\scripts-spp\setup-dev.ps1"
+    Write-FAIL "Build the project first:  .\scripts-spp\win\dev-setup.ps1"
     exit 1
 }
 if (-not (Get-Command java -ErrorAction SilentlyContinue)) {

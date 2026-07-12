@@ -16,7 +16,7 @@
 - Node 22.16.0 / npm 10.9.2 pinned in the root `package.json` engines field.
 - License: EPL-2.0. Every upstream source file carries an Obeo/contributor EPL
   header — copy the header style of neighboring files. SysON++ files (ours) carry a
-  CEA LIST header (see `scripts-spp/verify-ai-docs.ps1` for the pattern).
+  CEA LIST header (see `scripts-spp/win/verify-ai-docs.ps1` for the pattern).
 
 ## Patterns to follow  `[inferred]`
 - **Generated EMF code is regenerated, never hand-edited.** The metamodel source of
@@ -48,5 +48,5 @@
 - License headers match neighbors; diffs are surgical; ai/ knowledge updated if the
   change moved or added modules/features.
 - If ai/ was touched: path claims verified — CI runs ai-fication-kit verify via
-  `.github/workflows/ai-check.yml`; locally run `scripts-spp/verify-ai-docs.ps1`
+  `.github/workflows/ai-check.yml`; locally run `scripts-spp/win/verify-ai-docs.ps1`
   (writes reports to ai/analysis/audit-reports/).

@@ -53,7 +53,7 @@ upstream code is **frozen**; our experimental work is isolated to `ai/`, `script
 ```
 syson-plus-plus/
 ├── ai/                      🧠 OURS — AI knowledge layer (guide · analysis · lab)
-├── scripts-spp/             🛠️ OURS — dev tooling & guardrails (Windows PowerShell)
+├── scripts-spp/             🛠️ OURS — dev tooling & guardrails (win/ for Windows, etc.)
 ├── backend/                 ❄️ frozen upstream — Java 21 · Spring Boot · Sirius Web
 ├── frontend/                ❄️ frozen upstream — React + TypeScript (Vite)
 ├── integration-tests-*/     ❄️ frozen upstream — Cypress · Playwright E2E
@@ -96,7 +96,7 @@ New features are built spec-first, with automated feedback loops — so structur
 
 ## 🧱 AI-Native Guardrails (what actually exists today)
 
-* **Knowledge-layer verification** — [`scripts-spp/verify-ai-docs.ps1`](scripts-spp/verify-ai-docs.ps1)
+* **Knowledge-layer verification** — [`scripts-spp/win/verify-ai-docs.ps1`](scripts-spp/win/verify-ai-docs.ps1)
   (+ `-backend` / `-frontend`) extracts every backtick-quoted `.java` / `.graphqls` / `.g4` claim from the
   `ai/` docs and cross-checks it against the real source tree, so the knowledge layer can't silently drift.
 * **EMF generated-code shield** — [`scripts-spp/check-generated-edits.js`](scripts-spp/check-generated-edits.js)
@@ -115,13 +115,13 @@ New features are built spec-first, with automated feedback loops — so structur
 
 ```powershell
 # First time on a machine — check deps, build, and run everything
-.\scripts-spp\setup-dev.ps1
+.\scripts-spp\win\dev-setup.ps1
 
 # Daily — start database → backend → frontend
-.\scripts-spp\start-dev.ps1
+.\scripts-spp\win\dev-start.ps1
 
 # Stop everything (DB container is paused, not deleted)
-.\scripts-spp\stop-dev.ps1
+.\scripts-spp\win\dev-stop.ps1
 ```
 
 | Service | URL |
@@ -152,7 +152,7 @@ npm test        # frontend (Vitest via turbo)
 node scripts-spp\install-hooks.js
 
 # Verify the ai/ knowledge layer against the codebase
-.\scripts-spp\verify-ai-docs.ps1
+.\scripts-spp\win\verify-ai-docs.ps1
 ```
 
 ---
