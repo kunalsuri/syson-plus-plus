@@ -15,9 +15,10 @@ package org.eclipse.syson.diagram.common.view.tools;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.trees.renderer.TreeRenderer;
 import org.eclipse.sirius.components.view.diagram.SelectionDialogDescription;
-import org.eclipse.syson.diagram.common.view.services.ViewCreateService;
-import org.eclipse.syson.diagram.common.view.services.ViewToolService;
+import org.eclipse.syson.diagram.services.aql.DiagramMutationAQLService;
+import org.eclipse.syson.diagram.services.aql.DiagramQueryAQLService;
 import org.eclipse.syson.sysml.SysmlPackage;
+import org.eclipse.syson.tree.services.aql.TreeQueryAQLService;
 import org.eclipse.syson.util.AQLConstants;
 import org.eclipse.syson.util.ServiceMethod;
 import org.eclipse.syson.util.SysMLMetamodelHelper;
@@ -31,15 +32,15 @@ public class SubjectCompartmentNodeToolProvider extends AbstractCompartmentNodeT
 
     @Override
     protected String getServiceCallExpression() {
-        return ServiceMethod.of1(ViewCreateService::createReferenceUsageAsSubject).aqlSelf("selectedObject");
+        return ServiceMethod.of1(DiagramMutationAQLService::createReferenceUsageAsSubject).aqlSelf("selectedObject");
     }
 
     @Override
     protected SelectionDialogDescription getSelectionDialogDescription() {
         String domainType = SysMLMetamodelHelper.buildQualifiedName(SysmlPackage.eINSTANCE.getType());
         var selectionDialogTree = this.diagramBuilderHelper.newSelectionDialogTreeDescription()
-                .elementsExpression(ServiceMethod.of0(ViewToolService::getSubjectSelectionDialogElements).aql(IEditingContext.EDITING_CONTEXT))
-                .childrenExpression(ServiceMethod.of2(ViewToolService::getSubjectSelectionDialogChildren).aqlSelf(IEditingContext.EDITING_CONTEXT, TreeRenderer.EXPANDED))
+                .elementsExpression(ServiceMethod.of0(TreeQueryAQLService::getSubjectSelectionDialogElements).aql(IEditingContext.EDITING_CONTEXT))
+                .childrenExpression(ServiceMethod.of2(TreeQueryAQLService::getSubjectSelectionDialogChildren).aqlSelf(IEditingContext.EDITING_CONTEXT, TreeRenderer.EXPANDED))
                 .isSelectableExpression(AQLConstants.AQL_SELF + ".oclIsKindOf(" + domainType + ")")
                 .build();
         return this.diagramBuilderHelper.newSelectionDialogDescription()
@@ -71,7 +72,7 @@ public class SubjectCompartmentNodeToolProvider extends AbstractCompartmentNodeT
 
     @Override
     protected String getPreconditionExpression() {
-        return ServiceMethod.of0(ViewCreateService::isEmptySubjectCompartment).aqlSelf();
+        return ServiceMethod.of0(DiagramQueryAQLService::isEmptySubjectCompartment).aqlSelf();
     }
 
     @Override
